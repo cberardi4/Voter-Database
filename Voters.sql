@@ -40,6 +40,7 @@ CREATE TABLE `VoterAddress` (
   `streetNumber` int(11) DEFAULT NULL,
   `street` varchar(30) DEFAULT NULL,
   `zip` int(11) DEFAULT NULL,
+  `city` varchar(30) DEFAULT NULL,
   `state` varchar(2) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 )
