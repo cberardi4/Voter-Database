@@ -23,5 +23,5 @@ Written in order in which the classes get called
 - read in csv file? idk could get rid of it if theres an easier way
 
 #### How classes get called:
-Main > Database Manager > Connection
-Main > Database Manager > Person
+- Main > Database Manager > Connection
+- Main > Database Manager > Person
