@@ -1,5 +1,8 @@
 # Voter-Database
 
+### Current Functionality:
+- can register a new voter
+
 ## Classes
 Written in order in which the classes get called
 
