@@ -25,3 +25,6 @@ Written in order in which the classes get called
 #### How classes get called:
 - Main > Database Manager > Connection
 - Main > Database Manager > Person
+
+
+*** currently working on the voter registration option right now, adding voter addresses and have to also add voter contact info
