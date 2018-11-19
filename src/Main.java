@@ -22,7 +22,7 @@ public class Main {
 
         // id counts how many people have been added, used for sql queries (easier than having to do query for id of person)
         int id = 1, numCandidates=0;
-        String description;
+        String description, zip;
 
 
         // menu
@@ -73,7 +73,9 @@ public class Main {
                     // voter because ID numbers start at zero
                     id++;
                     manager.createVoterContactInfo(user, password, id);
-                    // add to database
+                    zip = manager.createVoterAddress(user, password, id);
+                    manager.createZipCodeInfo(user, password, id, zip);
+
                     break;
                 case 2:
                     // ask for id
