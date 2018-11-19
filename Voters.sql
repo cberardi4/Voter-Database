@@ -53,7 +53,7 @@ CREATE TABLE `VoterContactInfo` (
 )
 
 CREATE TABLE `Voters`.`ZipCodeInfo` (
-  `idZipCodeInfo` INT NOT NULL AUTO_INCREMENT,
+  `zipID` INT NOT NULL AUTO_INCREMENT,
   `zip` VARCHAR(5) NULL,
   `state` VARCHAR(2) NULL,
   PRIMARY KEY (`idZipCodeInfo`))
