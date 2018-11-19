@@ -40,6 +40,7 @@ CREATE TABLE `VoterAddress` (
   `streetNumber` int(11) DEFAULT NULL,
   `street` varchar(30) DEFAULT NULL,
   `zip` int(11) DEFAULT NULL,
+  `city` varchar(30) DEFAULT NULL,
   `state` varchar(2) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 )
@@ -51,3 +52,9 @@ CREATE TABLE `VoterContactInfo` (
   `cellPhone` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 )
+
+CREATE TABLE `Voters`.`ZipCodeInfo` (
+  `zipID` INT NOT NULL AUTO_INCREMENT,
+  `zip` VARCHAR(5) NULL,
+  `state` VARCHAR(2) NULL,
+  PRIMARY KEY (`idZipCodeInfo`))
