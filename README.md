@@ -19,6 +19,14 @@ Written in order in which the classes get called
 ### People:
 - creates a new person object by getting user input (and cleans it) and crafts special sql statements tailored to that person
 
+### Address:
+- creates a new address for a person object by getting user input, cleaning it, and crafting SQL statements for the VoterAddress table
+
+### ContactInfo:
+- creates contact info for a person object by getting user input, cleaning it, and crafting SQL statements for the VoterContactInfo table
+
+** NEED TO CREATE RECORD FOR PEOPLE, ADDRESS, AND CONTACTINFO TABLES EVERY TIME REGISTERING A VOTER
+
 ### DataGenerator
 - creates csv file of data
 
@@ -35,4 +43,6 @@ Written in order in which the classes get called
 ## To Create a new table:
 - main:
   - use the DatabaseManager manager object to the create function in the DB Manager class
-   - DB Manager class calls the Person p object which creates the SQL statements
+   - DB Manager class calls the Person p, Address a, or ContactInfo i objects which create the SQL statements
+   - SQL statements are then executed in the DB manager class
+   
