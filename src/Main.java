@@ -2,64 +2,76 @@ import java.util.Scanner;
 
 public class Main {
 
+    // create new object to that communicates between database and program
+    static DatabaseManager manager = new DatabaseManager();
+
+    static Scanner keyboard = new Scanner(System.in);
+
     public static void main(String[] args) throws Exception
     {
-
-        Scanner keyboard = new Scanner(System.in);
+        int id = 0;
+        String user, password;
 
         // login to MySQL Workbench
         System.out.println("username: ");
-        String user = keyboard.nextLine();
+        user = keyboard.nextLine();
         System.out.println("password: ");
-        String password  = keyboard.nextLine();
-
-        // create new object to that communicates between database and program
-        DatabaseManager manager = new DatabaseManager();
+        password  = keyboard.nextLine();
 
         // generate data into a csv file
         //DataGenerator df = new DataGenerator();
         //df.createData(20);
 
         // id counts how many people have been added, used for sql queries (easier than having to do query for id of person)
-        int id = 1, numCandidates=0;
+        int numCandidates=0;
         String description, zip;
 
 
         // menu
         System.out.println("Hello! Welcome to Chappy eVote!");
-        System.out.println("Before anything, the candidates must be registered.");
+
+        String[] candidateName;
+        String candFirstName, candLastName;
+
+        // function to register candidates is at bottom
 
         /*
         // create candidates
-        while(true)
+        while(numCandidates < 2)
         {
-            System.out.println("What is your ID number? ");
-            id =  Integer.parseInt(keyboard.nextLine());
+            id++;
+            System.out.println("First you must register as a voter, then we can move on to candidate registration");
+            registerPerson(user, password, id);
 
-            // fetch first nme and last name;
+            System.out.println("Please provide a description to your voters about your beliefs. (40 characters)");
+            // check amount entered isn't over limit
 
-            //System.out.println("Welcome " + firstName + lastName);
-
-            System.out.println("Please provide a desription to your voters about your beliefs. (40 characters)");
-            // check amount entered isnt over limit
+            // figure out how to get an entire sentence and not just a word
             description = keyboard.next();
+
+            // create new record in Candidate Table
+            registerCandidate(user, password, id);
 
             System.out.println("Thank you! You are now a registered candidate.");
             // add them to database
 
             numCandidates++;
-            break;
         }
-*/
-        boolean continueRunning = true, anotherTask;
-        int choice;
+        */
+
+        boolean continueRunning = true;
+        int choice, c;
 
         while(continueRunning)
         {
-            System.out.println("Select an option");
+            System.out.println("Select an option: ");
             System.out.println("1. Register to vote.");
             System.out.println("2. Vote for a candidate.");
             System.out.println("3. Print information.");
+            System.out.println("4. Generate Reports");
+            System.out.println("5. Delete a voter");
+            System.out.println("6. Withdraw candidate");
+            System.out.println("7. Update information (candidate or voter)");
 
             choice = Integer.parseInt(keyboard.nextLine());
 
@@ -68,30 +80,159 @@ public class Main {
                 // register to vote
                 // when creating new person, have to get general info, contact info, and address
                 case 1:
-                    manager.createPerson(user, password);
                     // counting number of voters created will also be id number of current
                     // voter because ID numbers start at zero
                     id++;
-                    manager.createVoterContactInfo(user, password, id);
-                    zip = manager.createVoterAddress(user, password, id);
-                    manager.createZipCodeInfo(user, password, id, zip);
-
+                    // create a new person record
+                    registerPerson(user, password, id);
                     break;
+
                 case 2:
+                    // needs to be implemented
                     // ask for id
                     // vote using candidate id
                     // add to database
                     break;
                 case 3:
+                    c = printOptions();
+                    executePrintOption(c, user, password);
                     break;
+                case 4:
+                    // needs to be implemented
+                    break;
+                case 5:
+                    deletePerson(user, password);
+                    break;
+                case 6:
+                    // delete candidate
+                    // delete person
+                case 7:
+                    updateInformation(user, password);
+                    break;
+                default:
+                    System.out.println("Not a valid option. Must be between 1 and 7");
+                    continue;
+
             }
             // ask user if they want to keep using the database
-            continueRunning = completeAnotherTask(keyboard);
+            continueRunning = completeAnotherTask();
         }
     }
 
+    /*
+    *********************
+    HELPER FUNCTIONS FOR THE MAIN
+    *********************
+     */
+
+    // calls functions in DB manager class that creates a new Person with contact info and an address
+    public static void registerPerson(String user, String password, int id) throws Exception {
+
+        // create record in all three tables
+        manager.createPerson(user, password, id);
+        manager.createVoterContactInfo(user, password, id);
+        manager.createVoterAddress(user, password, id);
+    }
+
+    // calls functions in DB manager class that deletes a
+    // person from the Person table, VoterAddressTable, and VoterContactInfo table
+    public static void deletePerson(String user, String password) throws Exception
+    {
+        String name;
+
+        System.out.println("ID of the person you wish to delete: ");
+        int id = Integer.parseInt(keyboard.nextLine());
+
+        // print the name of the person that you're deleting
+        // have to do it first because if you try to do after, their id won't exist
+        name = manager.printNameFromID(user ,password, id);
+
+        // returns an empty string when there's no query response, meaning that the ID didn't exist
+        if (name.equals(""))
+        {
+            System.out.println("ID did not exist. Could complete delete");
+        }
+
+        System.out.println(" has been deleted.");
+
+        manager.deletePerson(user, password, id);
+        manager.deleteAddress(user, password ,id);
+        manager.deleteContactInfo(user, password, id);
+    }
+
+    public static void updateInformation(String user, String password) throws Exception {
+        System.out.println("What kind of information would you like to update?");
+        System.out.println("1. Voter Information");
+        System.out.println("2. Candidate Information");
+
+        int choice = Integer.parseInt(keyboard.nextLine());
+        // variable to break while loop
+        boolean cont = true;
+
+        System.out.println("ID of the person you want to change: ");
+        int id = Integer.parseInt(keyboard.nextLine());
+
+        while(cont)
+        {
+            switch (choice)
+            {
+                case 1:
+                    updateVoterInfo(user, password, id);
+                    cont = false;
+                    break;
+                case 2:
+                    updateCandidateInfo(user, password, id);
+                    cont = false;
+                    break;
+                default:
+                    System.out.println("Not a valid option. Select 1 or 2.");
+            }
+        }
+    }
+
+    // needs to be implemented
+    // update candidate information
+    // helper function to updateInformation
+    public static void updateCandidateInfo(String user, String password, int id)
+    {
+
+    }
+
+    // update voter information
+    // helper function to updateInformation
+    public static void updateVoterInfo(String user, String password, int id) throws Exception {
+        System.out.println("Options to change: ");
+        System.out.println("1. Name");
+        System.out.println("2. Address");
+        System.out.println("3. Contact Information");
+        System.out.println("4. Political Party");
+
+        int choice = Integer.parseInt(keyboard.nextLine());
+
+        switch (choice)
+        {
+            // change name
+            case 1:
+                manager.updatePerson(user, password, id);
+                break;
+
+            // change address
+            case 2:
+                manager.updateVoterAddress(user, password, id);
+                break;
+        }
+    }
+
+
+    /*
+    public static void registerCandidate(String user, String password, int id)
+    {
+        manager.createCandidate(user, password, id);
+    }
+    */
+
     // function to ask user if they want to keep using the database
-    public static boolean completeAnotherTask(Scanner keyboard)
+    public static boolean completeAnotherTask()
     {
         String anotherTask;
         boolean continueRunning;
@@ -120,6 +261,54 @@ public class Main {
             }
         }
         return continueRunning;
+    }
+
+    // outputs print options when user wants to print information
+    public static int printOptions()
+    {
+        /*
+        each output on task list on google doc:
+        option 1 = task 1a
+        option 2-3 = task 2a, 2b
+        option 4 = 9 or 8?
+         */
+
+        int choice;
+
+        while(true)
+        {
+            System.out.println("Select an Option:");
+            System.out.println("1. Print all voters");
+            System.out.println("2. Print Candidates from selected Party");
+            System.out.println("3. Print how many registered voters from selected party");
+
+            choice = Integer.parseInt(keyboard.nextLine());
+
+            if (choice < 1 || choice >5)
+            {
+                System.out.println("Not a valid option. Try again.");
+                continue;
+            }
+            else break;
+        }
+        return choice;
+    }
+
+    // once user has decided that they want to print some information, it executes queries based on that choice
+    public static void executePrintOption(int choice, String user, String password) throws Exception
+    {
+        switch (choice)
+        {
+            case 1:
+                manager.selectAllVoters(user, password);
+                break;
+            case 2:
+                // need to be implemented
+                break;
+            case 3:
+                manager.numberRegisteredVotersInParty(user, password);
+
+        }
     }
 
 }
