@@ -38,8 +38,6 @@ Written in order in which the classes get called
 - Main > Database Manager > Person
 
 
-*** currently working on the voter registration option right now, adding voter addresses and have to also add voter contact info
-
 ## To Create a new table:
 - main:
   - use the DatabaseManager manager object to the create function in the DB Manager class
