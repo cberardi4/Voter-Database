@@ -19,10 +19,12 @@ CREATE TABLE `CandidateNames` (
 )
 
 CREATE TABLE `Party` (
-  `partyID` int(11) NOT NULL AUTO_INCREMENT,
+  `partyID` int(11) NOT NULL,
   `partyName` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`partyID`)
 )
+
+INSERT INTO `Party` VALUES (1,'Republican'),(2,'Democrat'),(3,'Independent'),(4,'Libertarian'),(5,'Green Party');
 
 CREATE TABLE `Person` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
