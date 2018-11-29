@@ -35,7 +35,7 @@ public class Main {
 
         // function to register candidates is at bottom
 
-        /*
+
         // create candidates
         while(numCandidates < 2)
         {
@@ -43,21 +43,38 @@ public class Main {
             System.out.println("First you must register as a voter, then we can move on to candidate registration");
             registerPerson(user, password, id);
 
-            System.out.println("Please provide a description to your voters about your beliefs. (40 characters)");
-            // check amount entered isn't over limit
+            while(true)
+            {
+                System.out.println("Please provide a description to your voters about your beliefs. (40 characters)");
+                // check amount entered isn't over limit
 
-            // figure out how to get an entire sentence and not just a word
-            description = keyboard.next();
+                description = keyboard.next();
+                description += keyboard.nextLine(); //gets whole line
 
-            // create new record in Candidate Table
-            registerCandidate(user, password, id);
+                //check that amt is <= 40 char
+                if(description.length()<40)
+                {
+                    // create new record in Candidate Table
+                    registerCandidate(user, password, id); //need description?
 
-            System.out.println("Thank you! You are now a registered candidate.");
-            // add them to database
+                    System.out.println("Thank you! You are now a registered candidate.");
+                    // add them to database
 
-            numCandidates++;
+                    numCandidates++;
+                    break;
+                }
+
+                else
+                {
+                    System.out.println("Please limit your description to 40 characters.");
+                }
+
+            }
+
+
+
         }
-        */
+
 
         boolean continueRunning = true;
         int choice, c;
@@ -65,8 +82,8 @@ public class Main {
         while(continueRunning)
         {
             System.out.println("Select an option: ");
-            System.out.println("1. Register to vote.");
-            System.out.println("2. Vote for a candidate.");
+            System.out.println("1. Register to vote."); //6a
+            System.out.println("2. Vote for a candidate."); //6b
             System.out.println("3. Print information.");
             System.out.println("4. Generate Reports");
             System.out.println("5. Delete a voter");
@@ -150,7 +167,7 @@ public class Main {
         // returns an empty string when there's no query response, meaning that the ID didn't exist
         if (name.equals(""))
         {
-            System.out.println("ID did not exist. Could complete delete");
+            System.out.println("ID did not exist. Could not complete delete");
         }
 
         System.out.println(" has been deleted.");
@@ -224,12 +241,12 @@ public class Main {
     }
 
 
-    /*
+
     public static void registerCandidate(String user, String password, int id)
     {
-        manager.createCandidate(user, password, id);
+        //manager.createCandidate(user, password, id);
     }
-    */
+
 
     // function to ask user if they want to keep using the database
     public static boolean completeAnotherTask()
