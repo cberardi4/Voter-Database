@@ -35,21 +35,46 @@ public class DatabaseManager
         // call person class and get all general user information from input for Person table
          ******************* */
 
-        String sql;
-        PreparedStatement preparedStatement;
+        String sqlP, sqlC, sqlA, zip, state;
+        String [] addressInfo;
+        PreparedStatement preparedStatementPerson, preparedStatementContact, preparedStatementAddress;
 
         // connect to database
         try {
             connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        sql = p.createPerson(id);
+
+        sqlP = p.createPerson(id);
+        sqlC = i.createVoterContactInfo(id);
+        addressInfo = a.createVoterAddress(id);
+
+        sqlA = addressInfo[0];
+        zip = addressInfo[1];
+        state = addressInfo[2];
+
+        // Transaction
+        connection.setAutoCommit(false);
 
         // convert string into SQL statement and insert into database
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
+        preparedStatementPerson = connection.prepareStatement(sqlP);
+        preparedStatementPerson.executeUpdate();
+
+        preparedStatementAddress = connection.prepareStatement(sqlA);
+        preparedStatementAddress.executeUpdate();
+
+        preparedStatementContact = connection.prepareStatement(sqlC);
+        preparedStatementContact.executeUpdate();
+
+        // end of transaction
+        connection.commit();
+
+        } catch (SQLException e){
+            connection.rollback();
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
