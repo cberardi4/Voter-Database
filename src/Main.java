@@ -18,6 +18,8 @@ public class Main {
         System.out.println("password: ");
         password  = keyboard.nextLine();
 
+        Candidate cand = new Candidate();
+
         // generate data into a csv file
         //DataGenerator df = new DataGenerator();
         //df.createData(20);
@@ -25,53 +27,24 @@ public class Main {
         // id counts how many people have been added, used for sql queries (easier than having to do query for id of person)
         int numCandidates=0;
         String description, zip;
-
+        String[] candidateName;
+        String candFirstName, candLastName;
 
         // menu
         System.out.println("Hello! Welcome to Chappy eVote!");
 
-        String[] candidateName;
-        String candFirstName, candLastName;
-
-        // function to register candidates is at bottom
-
-
-        // create candidates
+        // create candidates, max 3 candidates
         while(numCandidates < 2)
         {
             id++;
             System.out.println("First you must register as a voter, then we can move on to candidate registration");
             registerPerson(user, password, id);
 
-            while(true)
-            {
-                System.out.println("Please provide a description to your voters about your beliefs. (40 characters)");
-                // check amount entered isn't over limit
-
-                description = keyboard.next();
-                description += keyboard.nextLine(); //gets whole line
-
-                //check that amt is <= 40 char
-                if(description.length()<40)
-                {
-                    // create new record in Candidate Table
-                    registerCandidate(user, password, id); //need description?
-
-                    System.out.println("Thank you! You are now a registered candidate.");
-                    // add them to database
-
-                    numCandidates++;
-                    break;
-                }
-
-                else
-                {
-                    System.out.println("Please limit your description to 40 characters.");
-                }
-
-            }
-
-
+            //asks for description, checks max char count
+            cand.createDescription();
+            //adds candidate to all candidate tables
+            registerCandidate(user, password, id); //need description?
+            numCandidates++;
 
         }
 
@@ -149,6 +122,15 @@ public class Main {
         manager.createPerson(user, password, id);
         manager.createVoterContactInfo(user, password, id);
         manager.createVoterAddress(user, password, id);
+    }
+
+    public static void registerCandidate(String user, String password, int id) throws Exception
+    {
+        //create record in all 3 candidate tables
+        //manager.createCandidate(user, password, id);
+        //manager.createCandidateInfo(user, password, candidateID);
+        //manager.createCandidateNames(user, password, candidateID);
+
     }
 
     // calls functions in DB manager class that deletes a
@@ -239,14 +221,6 @@ public class Main {
                 break;
         }
     }
-
-
-
-    public static void registerCandidate(String user, String password, int id)
-    {
-        //manager.createCandidate(user, password, id);
-    }
-
 
     // function to ask user if they want to keep using the database
     public static boolean completeAnotherTask()
