@@ -9,7 +9,6 @@ public class Main {
 
     public static void main(String[] args) throws Exception
     {
-        int id = 0;
         String user, password;
 
         // login to MySQL Workbench
@@ -72,9 +71,8 @@ public class Main {
                 case 1:
                     // counting number of voters created will also be id number of current
                     // voter because ID numbers start at zero
-                    id++;
                     // create a new person record
-                    registerPerson(user, password, id);
+                    manager.createPerson(user, password);
                     break;
 
                 case 2:
@@ -115,14 +113,6 @@ public class Main {
     *********************
      */
 
-    // calls functions in DB manager class that creates a new Person with contact info and an address
-    public static void registerPerson(String user, String password, int id) throws Exception {
-
-        // create record in all three tables
-        manager.createPerson(user, password, id);
-        manager.createVoterContactInfo(user, password, id);
-        manager.createVoterAddress(user, password, id);
-    }
 
     public static void registerCandidate(String user, String password, int id) throws Exception
     {

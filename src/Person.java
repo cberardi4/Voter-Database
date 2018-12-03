@@ -12,7 +12,7 @@ public class Person
     Scanner keyboard = new Scanner(System.in);
 
     // creates a new Person record and gathers user input, then sends SQL query to DB manager to execute
-    public String createPerson(int id)
+    public String createPerson()
     {
         System.out.println("--------------------");
         System.out.println("Personal Information:");
@@ -27,8 +27,8 @@ public class Person
         candidateID = 0;
         partyID = createPartyID();
 
-        String sql = "INSERT INTO Person (ID, firstName, lastName, age, gender, candidateID, partyID)" +
-                        "VALUES (" + id + ", '" +  firstName + "', '" + lastName + "', " +  age + ", '" + gender +
+        String sql = "INSERT INTO Person (firstName, lastName, age, gender, candidateID, partyID)" +
+                        "VALUES ('" + firstName + "', '" + lastName + "', " +  age + ", '" + gender +
                         "', " + candidateID + ", " + partyID + ");";
         return sql;
     }
