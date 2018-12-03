@@ -39,10 +39,6 @@ public class Address
         return addressInfo;
     }
 
-    public String createVoterZip(String zipC, String state)
-    {
-        return "INSERT INTO ZipCodeInfo (zip, state)" + "VALUES ('" + zipC + "', '" + state + "');";
-    }
 
     public String deleteAddress(int id)
     {

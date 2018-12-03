@@ -11,8 +11,7 @@ import java.sql.SQLException;
 
 
 
-public class DatabaseManager
-{
+public class DatabaseManager {
     Connector con = new Connector();
     Connection connection;
 
@@ -21,6 +20,7 @@ public class DatabaseManager
     Address a = new Address();
     ContactInfo i = new ContactInfo();
     Person c = new Candidate();
+    ZipCodeInfo z = new ZipCodeInfo();
 
     /*
     **********************
@@ -29,144 +29,130 @@ public class DatabaseManager
      */
 
     // creates a new record in Person table
-    public void createPerson(String username, String password, int id) throws Exception {
+    public void createPerson(String username, String password) throws Exception {
         /* *****************
          Person TABLE
         // call person class and get all general user information from input for Person table
          ******************* */
 
-        String sqlP, sqlC, sqlA, zip, state;
-        String [] addressInfo;
-        PreparedStatement preparedStatementPerson, preparedStatementContact, preparedStatementAddress;
+        String sqlP, sqlC, sqlA, sqlZ, state, sqlCheck;
+        int zip, id=0;
+        boolean addZip;
+        String[] addressInfo;
+        PreparedStatement preparedStatementPerson, preparedStatementContact, preparedStatementAddress, preparedStatementZip;
+        ResultSet rs;
 
         // connect to database
         try {
             connection = con.Connector(username, password);
 
+            // Transaction
+            connection.setAutoCommit(false);
 
-        sqlP = p.createPerson(id);
-        sqlC = i.createVoterContactInfo(id);
-        addressInfo = a.createVoterAddress(id);
+            // *************
+            // PERSON
+            // *************
 
-        sqlA = addressInfo[0];
-        zip = addressInfo[1];
-        state = addressInfo[2];
+            // get SQL statement for creating a new record in Person table
+            sqlP = p.createPerson();
 
-        // Transaction
-        connection.setAutoCommit(false);
+            // convert string into SQL statement and insert into database
+            preparedStatementPerson = connection.prepareStatement(sqlP, PreparedStatement.RETURN_GENERATED_KEYS);
 
-        // convert string into SQL statement and insert into database
-        preparedStatementPerson = connection.prepareStatement(sqlP);
-        preparedStatementPerson.executeUpdate();
+            // want to rollback unless all insert statements are executed in this function
+            try {
+                // execute insert statement
+                preparedStatementPerson.executeUpdate();
+                connection.commit();
+            } catch (SQLException s) {
+                connection.rollback();
+            }
 
-        preparedStatementAddress = connection.prepareStatement(sqlA);
-        preparedStatementAddress.executeUpdate();
+            // get primary key from sql query to use as PK in other tables
+            rs = preparedStatementPerson.getGeneratedKeys();
+            if (rs != null && rs.next())
+                id = rs.getInt(1);
 
-        preparedStatementContact = connection.prepareStatement(sqlC);
-        preparedStatementContact.executeUpdate();
+            // *************
+            // CONTACT INFO
+            // *************
 
-        // end of transaction
-        connection.commit();
+            // Transaction
+            connection.setAutoCommit(false);
 
-        } catch (SQLException e){
-            connection.rollback();
+            // get SQL statement for creating a new record in Contact Info table
+            sqlC = i.createVoterContactInfo(id);
+
+            // convert string into SQL statement and insert into database
+            preparedStatementContact = connection.prepareStatement(sqlC);
+
+            // want to rollback unless all insert statements are executed in this function
+            try {
+                // execute insert statement
+                preparedStatementContact.executeUpdate();
+                connection.commit();
+            } catch (SQLException s) {
+                connection.rollback();
+            }
+
+            // *************
+            // ADDRESS
+            // *************
+
+            // Transaction
+            connection.setAutoCommit(false);
+
+            // get SQL query for creating a new record in Address Table
+            // also return zip and state for ZipCodeInfo Table
+            addressInfo = a.createVoterAddress(id);
+
+            // extract zip and state from contact
+            sqlA = addressInfo[0];
+            zip = Integer.parseInt(addressInfo[1]);
+            state = addressInfo[2];
+
+            // convert string into SQL statement and insert into database
+            preparedStatementAddress = connection.prepareStatement(sqlA);
+
+            // want to rollback unless all insert statements are executed in this function
+            try {
+                // execute insert statement
+                preparedStatementAddress.executeUpdate();
+                connection.commit();
+            } catch (SQLException s) {
+                connection.rollback();
+            }
+
+            // *************
+            // ZIP CODE
+            // *************
+
+            // Transaction
+            connection.setAutoCommit(false);
+
+
+            // check if zipcode is already in table and doesn't need to be added again
+            addZip = checkZipCode(zip);
+
+            // only want to add zip to table if the record doesn't already exist
+            if (addZip) {
+                // check if you need to add zip to database
+                try {
+                    sqlZ = z.createZipCodeInfo(zip, state);
+                    preparedStatementZip = connection.prepareStatement(sqlZ);
+                    preparedStatementZip.executeUpdate();
+                    connection.commit();
+                } catch (SQLException e) {
+                    connection.rollback();
+                }
+            }
+
+
+            // end of transaction
         }
-
         catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-
-    // create a new record in VoterContactInfo
-    public void createVoterContactInfo(String username, String password, int id) throws Exception
-    {
-        /* ***********************
-         VoterContactInfo TABLE
-         call person class and get contact information for VoterContactInfo table
-        *************************** */
-
-        String sql;
-        PreparedStatement preparedStatement;
-
-        // connect to database
-        try {
-            connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        sql = i.createVoterContactInfo(id);
-
-        // convert string into SQL statement and insert into database
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
-
-    }
-
-    // create a new record in VoterAddress table
-    public void createVoterAddress(String username, String password, int id) throws Exception
-    {
-        /* ***********************
-         ZipCodeInfo TABLE
-         call person class and get address information for VoterAddress table
-
-         Must create record in zip code table  with zip and state info
-        *************************** */
-
-        PreparedStatement preparedStatement;
-        String [] addressInfo;
-        String sql, zip, state;
-
-
-        // connect to database
-        try {
-            connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        addressInfo = a.createVoterAddress(id);
-
-        sql = addressInfo[0];
-        zip = addressInfo[1];
-        state = addressInfo[2];
-
-        // convert string into SQL statement and insert into database
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
-
-       createZipCodeInfo(username, password, zip, state);
-    }
-
-    // create a new record in the ZipCodeInfo table
-    public void createZipCodeInfo(String username, String password, String zip, String state) throws Exception
-    {
-        /* ***********************
-         ZipCodeInfo TABLE
-         call person class and get zip and state information for ZipCodeInfo table
-        *************************** */
-
-
-        String sql;
-        PreparedStatement preparedStatement;
-
-        // connect to database
-        try {
-            connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // FIRST NEED TO CHECK THAT ZIP CODE ISN'T ALREADY IN THE TABLE AND THAT STATE IS VALID
-
-        sql = a.createVoterZip(zip, state);
-
-        // convert string into SQL statement and insert into database
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
-
-
     }
 
         /*
@@ -221,8 +207,7 @@ public class DatabaseManager
 
     }
 
-    public void updateVoterAddress(String username, String password, int id) throws Exception
-    {
+    public void updateVoterAddress(String username, String password, int id) throws Exception {
 
         PreparedStatement preparedStatement;
 
@@ -238,7 +223,7 @@ public class DatabaseManager
 
         // 4 indexes in sql array, have to execute each update statement to update all
         // of address fields
-        for (int k = 0; k< 4; ++k) {
+        for (int k = 0; k < 4; ++k) {
             preparedStatement = connection.prepareStatement(sql[k]);
             preparedStatement.executeUpdate();
         }
@@ -317,8 +302,7 @@ public class DatabaseManager
      */
 
     // returns name, age, gender, and party of all voters
-    public void selectAllVoters(String username, String password) throws Exception
-    {
+    public void selectAllVoters(String username, String password) throws Exception {
         String sql;
         PreparedStatement preparedStatement;
         ResultSet rs;
@@ -340,9 +324,7 @@ public class DatabaseManager
     }
 
     // returns the number of voters in a certain party (given by user input)
-    public void numberRegisteredVotersInParty(String username, String password) throws Exception
-
-    {
+    public void numberRegisteredVotersInParty(String username, String password) throws Exception {
         String sql;
         PreparedStatement preparedStatement;
         ResultSet rs;
@@ -361,9 +343,7 @@ public class DatabaseManager
     }
 
 
-
-    public String printNameFromID(String username, String password, int id) throws Exception
-    {
+    public String printNameFromID(String username, String password, int id) throws Exception {
         String sql;
         PreparedStatement preparedStatement;
         ResultSet rs;
@@ -379,11 +359,10 @@ public class DatabaseManager
         preparedStatement = connection.prepareStatement(sql);
         rs = preparedStatement.executeQuery();
 
-        String f="", l="" ,name;
+        String f = "", l = "", name;
 
         // get first and last name from Result Set
-        while (rs.next())
-        {
+        while (rs.next()) {
             f = rs.getString("firstName");
             l = rs.getString("lastName");
         }
@@ -404,8 +383,7 @@ public class DatabaseManager
     */
 
     // print information from sql query
-    public void displayResultSetPerson (ResultSet rs) throws SQLException
-    {
+    public void displayResultSetPerson(ResultSet rs) throws SQLException {
 
         System.out.println("Selected Person: ");
 
@@ -413,8 +391,7 @@ public class DatabaseManager
         String firstName, lastName, gender;
 
         // iterate through SQL response to human-readable output
-        while (rs.next())
-        {
+        while (rs.next()) {
             firstName = rs.getString("firstName");
             lastName = rs.getString("lastName");
             age = rs.getInt("age");
@@ -422,5 +399,31 @@ public class DatabaseManager
             partyID = rs.getInt("partyID");
             System.out.println(firstName + ", " + lastName + ", " + age + ", " + gender + ", " + partyID);
         }
+    }
+
+    // query ZipCodeInfo Table to see if that zip is already in it
+    // if it is, then you don't need to add it
+    // returns true if a new zip code record needs to be created
+    public boolean checkZipCode(int zip) throws SQLException {
+        String sqlCheck;
+        int zipQuery;
+        PreparedStatement preparedStatementZip;
+        ResultSet rs;
+
+        try {
+
+            sqlCheck = z.checkIfZipAlreadyInDB(zip);
+            preparedStatementZip = connection.prepareStatement(sqlCheck);
+            rs = preparedStatementZip.executeQuery();
+
+            while (rs.next()) {
+                zipQuery = rs.getInt("zip");
+                if (zip == zipQuery)
+                    return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }
