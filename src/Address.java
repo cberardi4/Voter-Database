@@ -27,15 +27,15 @@ public class Address
 
         streetNumber = createStreetNumber();
         street = createStreet();
-        city = createCity();
+        //city = createCity();
         zip = createZip();
         state = createState();
 
         // need to return the zip information on its own so that it can be added to the zip database in the
         // main without having to ask the user twice for this information
-        String [] addressInfo =  {"INSERT INTO VoterAddress (ID, streetNumber, street, zip, city)" +
+        String [] addressInfo =  {"INSERT INTO VoterAddress (ID, streetNumber, street, zip)" +
                 "VALUES (" + id + ", " + streetNumber + ", '" + street + "', '" +
-                zip + "', '" + city +"');", zip, state};
+                zip + ");", zip, state};
         return addressInfo;
     }
 
@@ -52,15 +52,14 @@ public class Address
         // get new address
         streetNumber = createStreetNumber();
         street = createStreet();
-        city = createCity();
+        //city = createCity();
         zip = createZip();
         state = createState();
 
         // have to return an array of sql statements so that it can update every field in VoterAddress
         String []sql = {"UPDATE VoterAddress SET streetNumber = " + streetNumber + " WHERE ID = " + id + ";",
                 "UPDATE VoterAddress SET street = '" + street + "' WHERE ID = " + id + ";",
-                "UPDATE VoterAddress SET zip = '" + zip + "' WHERE ID = " + id + ";",
-                "UPDATE VoterAddress SET city = '" + city + "' WHERE ID = " + id + ";"};
+                "UPDATE VoterAddress SET zip = '" + zip + "' WHERE ID = " + id + ";"};
         return sql;
     }
 
@@ -104,6 +103,7 @@ public class Address
         return streetName;
     }
 
+    /*
     public String createCity()
     {
         String c;
@@ -149,7 +149,7 @@ public class Address
         }
         return c;
     }
-
+*/
 
     public String createZip()
     {

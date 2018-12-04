@@ -144,11 +144,9 @@ public class Main {
             System.out.println("ID did not exist. Could not complete delete");
         }
 
-        System.out.println(" has been deleted.");
+        System.out.println(name + " has been deleted.");
 
         manager.deletePerson(user, password, id);
-        manager.deleteAddress(user, password ,id);
-        manager.deleteContactInfo(user, password, id);
     }
 
     public static void updateInformation(String user, String password) throws Exception {
@@ -169,7 +167,7 @@ public class Main {
             switch (choice)
             {
                 case 1:
-                    updateVoterInfo(user, password);
+                    updateVoterInfo(user, password, id);
                     cont = false;
                     break;
                 case 2:
@@ -192,7 +190,7 @@ public class Main {
 
     // update voter information
     // helper function to updateInformation
-    public static void updateVoterInfo(String user, String password) throws Exception {
+    public static void updateVoterInfo(String user, String password, int id) throws Exception {
         System.out.println("Options to change: ");
         System.out.println("1. Name");
         System.out.println("2. Address");
@@ -205,12 +203,12 @@ public class Main {
         {
             // change name
             case 1:
-                //manager.updatePerson(user, password, id);
+                manager.updatePerson(user, password, id);
                 break;
 
             // change address
             case 2:
-                //manager.updateVoterAddress(user, password);
+                manager.updateVoterAddress(user, password, id);
                 break;
         }
     }
