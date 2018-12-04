@@ -181,8 +181,8 @@ public class Main {
         // variable to break while loop
         boolean cont = true;
 
-        System.out.println("ID of the person you want to change: ");
-        int id = Integer.parseInt(keyboard.nextLine());
+//        System.out.println("ID of the person you want to change: ");
+//        int id = Integer.parseInt(keyboard.nextLine());
 
 
         while(cont)
@@ -190,11 +190,15 @@ public class Main {
             switch (choice)
             {
                 case 1:
+                    System.out.println("ID of the person you want to change: ");
+                    int id = Integer.parseInt(keyboard.nextLine());
                     updateVoterInfo(user, password, id);
                     cont = false;
                     break;
                 case 2:
-                    updateCandidateInfo(user, password);
+                    System.out.println("CandidateID of the candidate you want to change: ");
+                    int candidateID = Integer.parseInt(keyboard.nextLine());
+                    updateCandidateInfo(user, password, candidateID);
                     cont = false;
                     break;
                 default:
@@ -206,9 +210,9 @@ public class Main {
     // needs to be implemented
     // update candidate information
     // helper function to updateInformation
-    public static void updateCandidateInfo(String user, String password)
+    public static void updateCandidateInfo(String user, String password, int candidateID) throws Exception
     {
-
+        manager.updateCandidate(user, password, candidateID);
     }
 
     // update voter information
