@@ -107,6 +107,8 @@ public class Main {
             // ask user if they want to keep using the database
             continueRunning = completeAnotherTask();
         }
+
+        manager.closeFile();
     }
 
     /*
@@ -220,23 +222,50 @@ public class Main {
     public static void updateVoterInfo(String user, String password, int id) throws Exception {
         System.out.println("Options to change: ");
         System.out.println("1. Name");
-        System.out.println("2. Address");
-        System.out.println("3. Contact Information");
-        System.out.println("4. Political Party");
+        System.out.println("2. Age");
+        System.out.println("3. Address");
+        System.out.println("4. Contact Information");
+        System.out.println("5. Political Party");
 
         int choice = Integer.parseInt(keyboard.nextLine());
+        boolean goAgain = true;
 
-        switch (choice)
-        {
-            // change name
-            case 1:
-                manager.updatePerson(user, password, id);
-                break;
+        while(goAgain) {
+            switch (choice) {
+                // change name
+                case 1:
+                    manager.updateName(user, password, id);
+                    goAgain = false;
+                    break;
 
-            // change address
-            case 2:
-                manager.updateVoterAddress(user, password, id);
-                break;
+                // change age
+                case 2:
+                    manager.updateAge(user, password, id);
+                    goAgain = false;
+                    break;
+
+                // change address
+                case 3:
+                    manager.updateVoterAddress(user, password, id);
+                    goAgain = false;
+                    break;
+
+                // change contact info
+                case 4:
+                    manager.updateVoterContactInfo(user, password, id);
+                    goAgain = false;
+                    break;
+
+                // change political party
+                case 5:
+                    manager.updateParty(user, password, id);
+                    goAgain = false;
+                    break;
+
+                // did not input valid option
+                default:
+                    System.out.println("Not a valid option. Must be between 1-5.");
+            }
         }
     }
 
@@ -319,5 +348,6 @@ public class Main {
 
         }
     }
+
 
 }
