@@ -27,6 +27,7 @@ public class DatabaseManager {
 
     FileWriter log;
 
+    // creating log variable
     {
         try {
             log = new FileWriter("log.csv");
@@ -68,7 +69,7 @@ public class DatabaseManager {
             // *************
 
             // get SQL statement for creating a new record in Person table
-            sqlP = p.createPerson(id);
+            sqlP = p.createPerson();
 
             // convert string into SQL statement and insert into database
             preparedStatementPerson = connection.prepareStatement(sqlP, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -80,14 +81,17 @@ public class DatabaseManager {
                 connection.commit();
             } catch (SQLException s) {
                 connection.rollback();
-            }
+                log.append("Creating person record failed. '\n'");
 
-            log.append("Create person record. '\n'");
+            }
 
             // get primary key from sql query to use as PK in other tables
             rs = preparedStatementPerson.getGeneratedKeys();
             if (rs != null && rs.next())
                 id = rs.getInt(1);
+
+            // log action
+            log.append("Create person record with ID = "+id+". '\n'");
 
             // *************
             // CONTACT INFO
@@ -109,7 +113,10 @@ public class DatabaseManager {
                 connection.commit();
             } catch (SQLException s) {
                 connection.rollback();
+                log.append("Creating VoterContactInfo with ID = "+id+" record failed. '\n'");
             }
+
+            log.append("Create VoterContactInfo record with ID = "+id+". '\n'");
 
             // *************
             // ADDRESS
@@ -137,7 +144,11 @@ public class DatabaseManager {
                 connection.commit();
             } catch (SQLException s) {
                 connection.rollback();
+                log.append("Creating VoterAddress with ID = "+id+" record failed. '\n'");
             }
+
+
+            log.append("Create VoterAddress with ID = "+id+" record. '\n'");
 
             // *************
             // ZIP CODE
@@ -160,9 +171,14 @@ public class DatabaseManager {
                     connection.commit();
                 } catch (SQLException e) {
                     connection.rollback();
+                    log.append("Create ZipCodeInfo with zip = "+zip+" record failed. '\n'");
                 }
+
+                log.append("Create ZipCode with zip = "+zip+" +record. '\n'");
+                log.close();
             }
 
+            log.close();
 
             // end of transaction
         }
@@ -285,9 +301,13 @@ public class DatabaseManager {
         // delete record from Person table
         sql = p.updateName(id);
 
+        // execute query
         preparedStatement = connection.prepareStatement(sql);
         preparedStatement.executeUpdate();
 
+        // log update
+        log.append("Updated name in Person record with id =  "+id+". '\n'");
+        log.close();
     }
 
     public void updateVoterAddress(String username, String password, int id) throws Exception {
@@ -333,49 +353,86 @@ public class DatabaseManager {
             e.printStackTrace();
         }
 
+
+        // *************
+        // PERSON
+        // *************
+
+        // Transaction
+        connection.setAutoCommit(false);
+
         // delete record from Person table
         sql = p.deletePerson(id);
+
         preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
-    }
 
-    public void deleteContactInfo(String username, String password, int id) throws Exception {
-
-        String sql;
-        PreparedStatement preparedStatement;
-
-        // connect to database
+        // want to rollback unless all delete statements are executed in this function
         try {
-            connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
+            // execute delete statement
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException s) {
+            connection.rollback();
+            log.append("Deleting Person with ID = "+id+" record failed. '\n'");
+            //log.close();
         }
 
-        // delete record from VoterContactInfo table
-        sql = i.deleteContactInfo(id);
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
+        log.append("Delete person with ID = "+id+" record. '\n'");
+        //log.close();
 
-    }
+        // *************
+        // Address
+        // *************
 
-    public void deleteAddress(String username, String password, int id) throws Exception {
-
-        String sql;
-        PreparedStatement preparedStatement;
-
-        // connect to database
-        try {
-            connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Transaction
+        connection.setAutoCommit(false);
 
         // delete record from VoterAddress table
         sql = a.deleteAddress(id);
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
-    }
 
+        preparedStatement = connection.prepareStatement(sql);
+
+        // want to rollback unless all delete statements are executed in this function
+        try {
+            // execute delete statement
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException s) {
+            connection.rollback();
+            log.append("Deleting VoterAddress with ID = "+id+" record failed. '\n'");
+            //log.close();
+        }
+
+        log.append("Delete VoterAddress with ID = "+id+" record. '\n'");
+        //log.close();
+
+        // *************
+        // CONTACT INFO
+        // *************
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        // delete record from VoterContactInfo table
+        sql = i.deleteContactInfo(id);
+
+        preparedStatement = connection.prepareStatement(sql);
+
+        // want to rollback unless all delete statements are executed in this function
+        try {
+            // execute insert statement
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException s) {
+            connection.rollback();
+            log.append("Deleting ContactInfo with ID = "+id+" record failed. '\n'");
+            //log.close();
+        }
+
+        log.append("Delete ContactInfo with ID = "+id+" record. '\n'");
+        log.close();
+
+    }
 
 
     /*
