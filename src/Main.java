@@ -94,8 +94,8 @@ public class Main {
                     deletePerson(user, password);
                     break;
                 case 6:
-                    // delete candidate
-                    // delete person
+                    deleteCandidate(user, password);
+                    break;
                 case 7:
                     updateInformation(user, password);
                     break;
@@ -148,6 +148,29 @@ public class Main {
 
         manager.deletePerson(user, password, id);
     }
+
+    public static void deleteCandidate(String user, String password) throws Exception
+    {
+        System.out.println("CandidateID of the candidate you wish to delete: ");
+        int candidateID = Integer.parseInt(keyboard.nextLine());
+
+        // print the name of the person that you're deleting
+        // have to do it first because if you try to do after, their id won't exist
+        String name = manager.printCandidateNameFromCID(user, password, candidateID);
+
+        // returns an empty string when there's no query response, meaning that the candidateID didn't exist
+        if (name.equals(""))
+        {
+            System.out.println("candidateID did not exist. Could not complete delete");
+        }
+
+        System.out.println(name + " has been deleted.");
+
+        manager.deleteCandidate(user, password, candidateID);
+
+
+    }
+
 
     public static void updateInformation(String user, String password) throws Exception {
         System.out.println("What kind of information would you like to update?");
