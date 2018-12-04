@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,6 +24,18 @@ public class DatabaseManager {
     Person c = new Candidate();
     ZipCodeInfo z = new ZipCodeInfo();
 
+
+    FileWriter log;
+
+    {
+        try {
+            log = new FileWriter("log.csv");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /*
     **********************
     CREATE NEW RECORDS
@@ -35,7 +49,7 @@ public class DatabaseManager {
         // call person class and get all general user information from input for Person table
          ******************* */
 
-        String sqlP, sqlC, sqlA, sqlZ, state, sqlCheck;
+        String sqlP, sqlC, sqlA, sqlZ, state;
         int zip, id=0;
         boolean addZip;
         String[] addressInfo;
@@ -67,6 +81,8 @@ public class DatabaseManager {
             } catch (SQLException s) {
                 connection.rollback();
             }
+
+            log.append("Create person record. '\n'");
 
             // get primary key from sql query to use as PK in other tables
             rs = preparedStatementPerson.getGeneratedKeys();
