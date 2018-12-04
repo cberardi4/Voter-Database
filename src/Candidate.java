@@ -103,6 +103,18 @@ public class Candidate extends Person
         return deleteCandNames;
     }
 
+    public String getNumberVotesForCandidate(int candidateID)
+    {
+        return "SELECT numberVotes FROM CandidateInfo WHERE candidateID = "+candidateID+";";
+    }
+
+
+    public String addVote(int candidateID, int newNumberVotes)
+    {
+        newNumberVotes++;
+        return "UPDATE CandidateInfo SET numberVotes = " + newNumberVotes + " WHERE candidateID = " + candidateID+";";
+    }
+
 
 //
 //    /*

@@ -525,6 +525,7 @@ public class DatabaseManager {
     {
         PreparedStatement preparedStatement;
         ResultSet rs;
+        int numVotesBeforeNewVote;
         String sql, name="", firstName, lastName;
 
         // connect to database
@@ -549,6 +550,20 @@ public class DatabaseManager {
 
         // update Person record to change who they voted for
         sql = p.updateVote(id, candidateID);
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.executeUpdate();
+
+        // need to add vote to their name in CandidateInfo Table
+
+        // first must get how many votes they have
+        sql = c.getNumberVotesForCandidate(candidateID);
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+        rs.next();
+        numVotesBeforeNewVote = rs.getInt("numberVotes");
+
+        // now must increment number of votes by one
+        sql = c.addVote(candidateID, numVotesBeforeNewVote);
         preparedStatement = connection.prepareStatement(sql);
         preparedStatement.executeUpdate();
 
