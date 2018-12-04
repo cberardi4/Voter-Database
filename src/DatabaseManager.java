@@ -434,6 +434,102 @@ public class DatabaseManager {
 
     }
 
+    // deletes a candidate, including their record in Candidate, CandidateInfo, and CandidateNames
+    public void deleteCandidate(String username, String password, int candidateID) throws Exception {
+
+        String sql, sql2, sql3;
+        PreparedStatement preparedStatement;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        // *************
+        // Candidate
+        // *************
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        // delete record from Candidate table
+        sql = c.deleteCandidate(candidateID);
+
+        preparedStatement = connection.prepareStatement(sql);
+
+        // want to rollback unless all delete statements are executed in this function
+        try {
+            // execute delete statement
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException s) {
+            connection.rollback();
+            log.append("Deleting candidate with candidateID = "+candidateID+" record failed. '\n'");
+            //log.close();
+        }
+
+        log.append("Delete candidate with candidateID = "+candidateID+" record. '\n'");
+        //log.close();
+
+        // *************
+        // CandidateInfo
+        // *************
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        // delete record from VoterAddress table
+        sql2 = c.deleteCandidateInfo(candidateID);
+
+        preparedStatement = connection.prepareStatement(sql2);
+
+        // want to rollback unless all delete statements are executed in this function
+        try {
+            // execute delete statement
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException s) {
+            connection.rollback();
+            log.append("Deleting CandidateInfo with candidateID = "+candidateID+" record failed. '\n'");
+            //log.close();
+        }
+
+        log.append("Delete CandidateID with candidateID = "+candidateID+" record. '\n'");
+        //log.close();
+
+        // *************
+        // CandidateNames
+        // *************
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        // delete record from CandidateNames table
+        sql3 = c.deleteCandNames(candidateID);
+
+        preparedStatement = connection.prepareStatement(sql3);
+
+        // want to rollback unless all delete statements are executed in this function
+        try {
+            // execute insert statement
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException s) {
+            connection.rollback();
+            log.append("Deleting CandidateNames with candidateID = "+candidateID+" record failed. '\n'");
+            //log.close();
+        }
+
+        log.append("Delete CandidateNames with candidateID = "+candidateID+" record. '\n'");
+        log.close();
+
+    }
+
+
+
 
     /*
     ***********************
@@ -511,6 +607,38 @@ public class DatabaseManager {
         System.out.println(name);
 
         return name;
+    }
+
+    public String printCandidateNameFromCID(String username, String password, int candidateID) throws Exception
+    {
+        String sql;
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sql = c.printCandidateFromCID(candidateID);
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+
+        String f = "", l = "", name;
+
+        // get first and last name from Result Set
+        while (rs.next()) {
+            f = rs.getString("firstName");
+            l = rs.getString("lastName");
+        }
+
+        name = f + " " + l;
+        //System.out.println(name);
+
+        return name;
+
     }
 
 
