@@ -17,7 +17,7 @@ public class Main {
         System.out.println("password: ");
         password  = keyboard.nextLine();
 
-        Candidate cand = new Candidate();
+        //Candidate cand = new Candidate();
 
         // generate data into a csv file
         //DataGenerator df = new DataGenerator();
@@ -26,26 +26,25 @@ public class Main {
         // id counts how many people have been added, used for sql queries (easier than having to do query for id of person)
         int numCandidates=0;
         String description, zip;
-        String[] candidateName;
-        String candFirstName, candLastName;
+//        String[] candidateName;
+//        String candFirstName, candLastName;
 
         // menu
         System.out.println("Hello! Welcome to Chappy eVote!");
 
-        // create candidates, max 3 candidates
-        while(numCandidates < 2)
-        {
-            id++;
-            System.out.println("First you must register as a voter, then we can move on to candidate registration");
-            registerPerson(user, password, id);
-
-            //asks for description, checks max char count
-            cand.createDescription();
-            //adds candidate to all candidate tables
-            registerCandidate(user, password, id); //need description?
-            numCandidates++;
-
-        }
+//        // create candidates, max 3 candidates
+//        while(numCandidates < 2)
+//        {
+//            System.out.println("First you must register as a voter, then we can move on to candidate registration");
+//            manager.createPerson(user, password);
+//
+//            //asks for description, checks max char count
+//            cand.createDescription();
+//            //adds candidate to all candidate tables
+//            //manager.createCandidate(user, password) //need description?
+//            numCandidates++;
+//
+//        }
 
 
         boolean continueRunning = true;
@@ -80,6 +79,7 @@ public class Main {
                     // ask for id
                     // vote using candidate id
                     // add to database
+                    //manager.vote(user, password); --implement
                     break;
                 case 3:
                     c = printOptions();
@@ -87,6 +87,8 @@ public class Main {
                     break;
                 case 4:
                     // needs to be implemented
+                    //generate csv with results
+                    //& print to screen
                     break;
                 case 5:
                     deletePerson(user, password);
@@ -114,14 +116,14 @@ public class Main {
      */
 
 
-    public static void registerCandidate(String user, String password, int id) throws Exception
-    {
-        //create record in all 3 candidate tables
-        //manager.createCandidate(user, password, id);
-        //manager.createCandidateInfo(user, password, candidateID);
-        //manager.createCandidateNames(user, password, candidateID);
-
-    }
+//    public static void registerCandidate(String user, String password) throws Exception
+//    {
+//        //create record in all 3 candidate tables
+//        //manager.createCandidate(user, password, id);
+//        //manager.createCandidateInfo(user, password, candidateID);
+//        //manager.createCandidateNames(user, password, candidateID);
+//
+//    }
 
     // calls functions in DB manager class that deletes a
     // person from the Person table, VoterAddressTable, and VoterContactInfo table
@@ -161,16 +163,17 @@ public class Main {
         System.out.println("ID of the person you want to change: ");
         int id = Integer.parseInt(keyboard.nextLine());
 
+
         while(cont)
         {
             switch (choice)
             {
                 case 1:
-                    updateVoterInfo(user, password, id);
+                    updateVoterInfo(user, password);
                     cont = false;
                     break;
                 case 2:
-                    updateCandidateInfo(user, password, id);
+                    updateCandidateInfo(user, password);
                     cont = false;
                     break;
                 default:
@@ -182,14 +185,14 @@ public class Main {
     // needs to be implemented
     // update candidate information
     // helper function to updateInformation
-    public static void updateCandidateInfo(String user, String password, int id)
+    public static void updateCandidateInfo(String user, String password)
     {
 
     }
 
     // update voter information
     // helper function to updateInformation
-    public static void updateVoterInfo(String user, String password, int id) throws Exception {
+    public static void updateVoterInfo(String user, String password) throws Exception {
         System.out.println("Options to change: ");
         System.out.println("1. Name");
         System.out.println("2. Address");
@@ -202,12 +205,12 @@ public class Main {
         {
             // change name
             case 1:
-                manager.updatePerson(user, password, id);
+                //manager.updatePerson(user, password, id);
                 break;
 
             // change address
             case 2:
-                manager.updateVoterAddress(user, password, id);
+                //manager.updateVoterAddress(user, password);
                 break;
         }
     }

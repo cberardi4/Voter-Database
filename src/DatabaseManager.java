@@ -19,7 +19,7 @@ public class DatabaseManager {
     Person p = new Person();
     Address a = new Address();
     ContactInfo i = new ContactInfo();
-    Person c = new Candidate();
+    Candidate c = new Candidate();
     ZipCodeInfo z = new ZipCodeInfo();
 
     /*
@@ -54,7 +54,7 @@ public class DatabaseManager {
             // *************
 
             // get SQL statement for creating a new record in Person table
-            sqlP = p.createPerson();
+            sqlP = p.createPerson(id);
 
             // convert string into SQL statement and insert into database
             preparedStatementPerson = connection.prepareStatement(sqlP, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -155,30 +155,97 @@ public class DatabaseManager {
         }
     }
 
-        /*
-    public void createCandidate(String username, String password, int id) throws Exception
-    {
-        /*
-        **************************
 
-        ***************************
-        */
-/*
-
-        String sql;
-        PreparedStatement preparedStatement;
-
-        // connect to database
-        try {
-            connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        sql = c.createCandidate(id);
-
-    }
-    */
+//    public void createCandidate(String username, String password) throws Exception
+//    {
+//        /* *****************
+//         Candidate TABLE
+//         ******************* */
+//
+//        String sqlC, sqlCI, sqlCN;
+//        int id=0, candidateID=0;
+//        PreparedStatement preparedStatementCandidate, preparedStatementCandidateInfo, preparedStatementCandidateNames;
+//        ResultSet rs;
+//
+//        // connect to database
+//        try {
+//            connection = con.Connector(username, password);
+//
+//            // Transaction
+//            connection.setAutoCommit(false);
+//
+//            // *************
+//            // Candidate
+//            // *************
+//
+//            // get SQL statement for creating a new record in Candidate table
+//            sqlC = c.createCandidate(id);
+//
+//            // convert string into SQL statement and insert into database
+//            preparedStatementCandidate = connection.prepareStatement(sqlC, PreparedStatement.RETURN_GENERATED_KEYS);
+//
+//            // want to rollback unless all insert statements are executed in this function
+//            try {
+//                // execute insert statement
+//                preparedStatementCandidate.executeUpdate();
+//                connection.commit();
+//            } catch (SQLException s) {
+//                connection.rollback();
+//            }
+//
+//            // get primary key from sql query to use as PK in other tables
+//            rs = preparedStatementCandidate.getGeneratedKeys();
+//            if (rs != null && rs.next())
+//                id = rs.getInt(1);
+//
+//            // *************
+//            // CANDIDATE INFO
+//            // *************
+//
+//            // Transaction
+//            connection.setAutoCommit(false);
+//
+//            // get SQL statement for creating a new record in Candidate Info table
+//            sqlCI = c.populateCandidateInfo(candidateID);
+//
+//            // convert string into SQL statement and insert into database
+//            preparedStatementCandidateInfo = connection.prepareStatement(sqlCI);
+//
+//            // want to rollback unless all insert statements are executed in this function
+//            try {
+//                // execute insert statement
+//                preparedStatementCandidateInfo.executeUpdate();
+//                connection.commit();
+//            } catch (SQLException s) {
+//                connection.rollback();
+//            }
+//
+//            // *************
+//            // Candidate Names
+//            // *************
+//
+//            // Transaction
+//            connection.setAutoCommit(false);
+//
+//            sqlCN = c.populateCandidateNames(candidateID);
+//
+//            // convert string into SQL statement and insert into database
+//            preparedStatementCandidateNames = connection.prepareStatement(sqlCN);
+//
+//            // want to rollback unless all insert statements are executed in this function
+//            try {
+//                // execute insert statement
+//                preparedStatementCandidateNames.executeUpdate();
+//                connection.commit();
+//            } catch (SQLException s) {
+//                connection.rollback();
+//            }
+//            // end of transaction
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /*
     *********************
