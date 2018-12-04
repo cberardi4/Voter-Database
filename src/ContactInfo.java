@@ -18,7 +18,7 @@ public class ContactInfo
         cellPhone = createPhoneNumber("cell");
         emailAddress = createEmailAddress();
 
-        return "INSERT INTO VoterContactInfo (ID, email, homePhone, cellPhone)" +
+        return "INSERT INTO VoterContactInfo (ID, email, homePhone, cellPhone) " +
                 "VALUES (" + id + ", '" + emailAddress + "', '" + homePhone + "', '" + cellPhone + "');";
     }
 
@@ -26,6 +26,23 @@ public class ContactInfo
     {
         return "DELETE FROM VoterContactInfo WHERE ID = " + id + ";";
     }
+
+
+    public String[] updateContactInfo(int id)
+    {
+        System.out.println("Print new update information: ");
+
+        homePhone = createPhoneNumber("home");
+        cellPhone = createPhoneNumber("cell");
+        emailAddress = createEmailAddress();
+
+        // have to return an array of sql statements so that it can update every field in VoterContactInfo
+        String []sql = {"UPDATE VoterContactInfo SET email = '" + emailAddress + "' WHERE ID = " + id + ";",
+                "UPDATE VoterContactInfo SET homePhone = '" + homePhone + "' WHERE ID = " + id + ";",
+                "UPDATE VoterContactInfo SET cellPhone = '" + cellPhone + "' WHERE ID = " + id + ";"};
+        return sql;
+    }
+
 
 
     /*

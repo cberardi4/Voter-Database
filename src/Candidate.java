@@ -41,6 +41,69 @@ public class Candidate extends Person
 //
 //        return sql;
 //    }
+
+    public String selectAllCandidateNames()
+    {
+        return "SELECT firstName, lastName FROM CandidateNames;";
+    }
+
+    public String getCandidateNameFromID(int candidateID)
+    {
+        return "SELECT firstName, lastName FROM CandidateNames WHERE candidateID = "+candidateID+";";
+    }
+
+
+    public String getCandidateName(int candidateID)
+    {
+        String fName = "SELECT p.firstName, p.lastName FROM Person p, Candidate c WHERE c.ID = p.ID";
+        return fName;
+
+        //need result set
+
+    }
+
+    public String updateDescription(int candidateID)
+    {
+        String sql;
+        while(true)
+        {
+            System.out.println("Please enter a new description (Limit 100 char): ");
+            description = keyboard.nextLine();
+            if(description.length()<=100)
+            {
+                sql = "UPDATE CandidateInfo SET description = '" + description + "' WHERE candidateID = " + candidateID + ";";
+                break;
+            }
+
+            else
+            {
+                System.out.println("Please shorten your description to 100 characters or less.");
+            }
+        }
+
+        return sql;
+    }
+
+    public String deleteCandidate(int candidateID)
+    {
+        String deleteCand = "DELETE FROM Candidate c WHERE c.candidateID = " + String.valueOf(candidateID);
+        return deleteCand;
+    }
+
+    public String deleteCandidateInfo(int candidateID)
+    {
+        String deleteCandInfo = "DELETE FROM CandidateInfo WHERE candidateID = " + candidateID + ";";
+        return deleteCandInfo;
+    }
+
+
+    public String deleteCandNames(int candidateID)
+    {
+        String deleteCandNames = "DELETE FROM CandidateNames WHERE candidateID = " + candidateID + ";";
+        return deleteCandNames;
+    }
+
+
 //
 //    /*
 //    ***************************
@@ -70,19 +133,5 @@ public class Candidate extends Person
 //        }
 //    }
 
-    public String getCandidateFirstName(int candidateID)
-    {
-        String fName = "SELECT p.firstName FROM Person p, Candidate c WHERE c.id = p.id";
-        return fName;
-
-        //need result set
-
-    }
-
-    public String deleteCandidate(int candidateID)
-    {
-        String deleteCand = "DELETE FROM Candidate c WHERE c.candidateID = " + String.valueOf(candidateID);
-        return deleteCand;
-    }
 
 }

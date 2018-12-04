@@ -75,11 +75,7 @@ public class Main {
                     break;
 
                 case 2:
-                    // needs to be implemented
-                    // ask for id
-                    // vote using candidate id
-                    // add to database
-                    //manager.vote(user, password); --implement
+                    vote(user, password);
                     break;
                 case 3:
                     c = printOptions();
@@ -126,6 +122,48 @@ public class Main {
 //        //manager.createCandidateNames(user, password, candidateID);
 //
 //    }
+
+    public static void vote(String user, String password) throws Exception {
+
+        String[] candidates;
+        int selection;
+
+        System.out.println("What is your ID number? ");
+        int id = Integer.parseInt(keyboard.nextLine());
+        int count =1;
+
+        while(true)
+        {
+
+            System.out.println("Options for voting: ");
+            System.out.println("----------------------");
+
+            // query to return all candidate names
+            candidates = manager.printAllCandidates(user, password);
+
+            // print all candidates to see their options
+            for (int k = 0; k < 3; ++k) {
+                System.out.println(count + ". " + candidates[k]);
+                count++;
+            }
+
+            System.out.println("Number of candidate you want to vote for");
+            selection = Integer.parseInt(keyboard.nextLine());
+
+            if (selection > 3 || selection < 1)
+            {
+                System.out.println("Not a valid option. Try again.");
+                continue;
+            }
+            else
+            {
+                manager.vote(user, password, id, selection);
+                break;
+            }
+
+        }
+
+    }
 
     // calls functions in DB manager class that deletes a
     // person from the Person table, VoterAddressTable, and VoterContactInfo table
@@ -183,8 +221,8 @@ public class Main {
         // variable to break while loop
         boolean cont = true;
 
-//        System.out.println("ID of the person you want to change: ");
-//        int id = Integer.parseInt(keyboard.nextLine());
+        System.out.println("ID of the person you want to change: ");
+        int id = Integer.parseInt(keyboard.nextLine());
 
 
         while(cont)
@@ -192,15 +230,11 @@ public class Main {
             switch (choice)
             {
                 case 1:
-                    System.out.println("ID of the person you want to change: ");
-                    int id = Integer.parseInt(keyboard.nextLine());
                     updateVoterInfo(user, password, id);
                     cont = false;
                     break;
                 case 2:
-                    System.out.println("CandidateID of the candidate you want to change: ");
-                    int candidateID = Integer.parseInt(keyboard.nextLine());
-                    updateCandidateInfo(user, password, candidateID);
+                    manager.updateCandidateInfo(user, password, id);
                     cont = false;
                     break;
                 default:
@@ -208,14 +242,17 @@ public class Main {
             }
         }
     }
-
+/*
     // needs to be implemented
     // update candidate information
     // helper function to updateInformation
     public static void updateCandidateInfo(String user, String password, int candidateID) throws Exception
     {
+        //System.out.println("CandidateID of the candidate you want to change: ");
+        //int candidateID = Integer.parseInt(keyboard.nextLine());
         manager.updateCandidate(user, password, candidateID);
     }
+    */
 
     // update voter information
     // helper function to updateInformation
@@ -347,6 +384,11 @@ public class Main {
                 manager.numberRegisteredVotersInParty(user, password);
 
         }
+    }
+
+    public static void updateCandidateInfo(String user, String password, int candidateID) throws Exception
+    {
+        manager.updateCandidateInfo(user, password, candidateID);
     }
 
 
