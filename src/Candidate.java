@@ -79,4 +79,10 @@ public class Candidate extends Person
 
     }
 
+    public String deleteCandidate(int candidateID)
+    {
+        String deleteCand = "DELETE FROM Candidate c WHERE c.candidateID = " + String.valueOf(candidateID);
+        return deleteCand;
+    }
+
 }
