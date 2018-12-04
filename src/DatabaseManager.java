@@ -175,10 +175,8 @@ public class DatabaseManager {
                 }
 
                 log.append("Create ZipCode with zip = "+zip+" +record. '\n'");
-                log.close();
             }
 
-            log.close();
 
             // end of transaction
         }
@@ -286,7 +284,7 @@ public class DatabaseManager {
      */
 
     // updates a user's first or last name in the Person table
-    public void updatePerson(String username, String password, int id) throws Exception {
+    public void updateName(String username, String password, int id) throws Exception {
 
         String sql;
         PreparedStatement preparedStatement;
@@ -298,16 +296,26 @@ public class DatabaseManager {
             e.printStackTrace();
         }
 
-        // delete     record from Person table
+        // delete record from Person table
         sql = p.updateName(id);
 
-        // execute query
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
+        // Transaction
+        connection.setAutoCommit(false);
+
+        try{
+            // execute query
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException e) {
+            connection.rollback();
+            log.append("Changing name of ID = "+id+" record failed. '\n'");
+        }
+
 
         // log update
         log.append("Updated name in Person record with id =  "+id+". '\n'");
-        log.close();
     }
 
     public void updateVoterAddress(String username, String password, int id) throws Exception {
@@ -321,17 +329,168 @@ public class DatabaseManager {
             e.printStackTrace();
         }
 
-        // delete record from Person table
+        // delete record from VoterAddress table
         String[] sql = a.updateAddress(id);
 
-        // 4 indexes in sql array, have to execute each update statement to update all
-        // of address fields
-        for (int k = 0; k < 4; ++k) {
-            preparedStatement = connection.prepareStatement(sql[k]);
-            preparedStatement.executeUpdate();
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        try {
+
+            // 3 indexes in sql array, have to execute each update statement to update all
+            // of address fields
+            for (int k = 0; k < 3; ++k) {
+                preparedStatement = connection.prepareStatement(sql[k]);
+                preparedStatement.executeUpdate();
+            }
+            connection.commit();
+        }
+        catch (SQLException e) {
+            connection.rollback();
+            log.append("Changing address in VoterAddress record with id = "+id+" record failed. '\n'");
         }
 
+        // log update
+        log.append("Updating address in VoterAddress record with id =  "+id+". '\n'");
+
     }
+
+
+    public void updateVoterContactInfo(String username, String password, int id) throws Exception {
+
+        PreparedStatement preparedStatement;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        // delete record from VoterContactInfo table
+        String[] sql = i.updateContactInfo(id);
+
+        try {
+            // 3 indexes in sql array, have to execute each update statement to update all
+            // of address fields
+
+            preparedStatement = connection.prepareStatement(sql[0]);
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException e) {
+            connection.rollback();
+            log.append("Updating home phone in VoterContactInfo record with id = "+id+" record failed. '\n'");
+        }
+
+        // Transaction
+        connection.setAutoCommit(false);
+        try {
+            // 3 indexes in sql array, have to execute each update statement to update all
+            // of address fields
+
+            preparedStatement = connection.prepareStatement(sql[1]);
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException e) {
+            connection.rollback();
+            log.append("Updating cell phone in VoterContactInfo record with id = "+id+" record failed. '\n'");
+        }
+        // Transaction
+        connection.setAutoCommit(false);
+        try {
+            // 3 indexes in sql array, have to execute each update statement to update all
+            // of address fields
+
+            preparedStatement = connection.prepareStatement(sql[2]);
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException e) {
+            connection.rollback();
+            log.append("Updating email in VoterContactInfo record with id = "+id+" record failed. '\n'");
+        }
+
+
+        // log update
+        log.append("Updated contact info in VoterContactInfo record with id =  "+id+". '\n'");
+
+    }
+
+    public void updateAge(String username, String password, int id) throws Exception
+    {
+
+        PreparedStatement preparedStatement;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        // delete record from VoterContactInfo table
+        String sql = p.updateAge(id);
+        System.out.println("SQL: " + sql);
+
+        try {
+
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException e) {
+            connection.rollback();
+            log.append("Updating age in Person record with id = "+id+" record failed. '\n'");
+        }
+
+        // log update
+        log.append("Updated age in Person record with id =  "+id+". '\n'");
+
+    }
+
+    public void updateParty(String username, String password, int id) throws Exception
+    {
+
+        PreparedStatement preparedStatement;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Transaction
+        connection.setAutoCommit(false);
+
+        // delete record from VoterContactInfo table
+        String sql = p.updatePoliticalParty(id);
+
+        try {
+
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException e) {
+            connection.rollback();
+            log.append("Updating political party in Person record with id = "+id+" record failed. '\n'");
+        }
+
+        // log update
+        log.append("Updated political party in Person record with id =  "+id+". '\n'");
+
+    }
+
 
 
     /*
@@ -374,11 +533,9 @@ public class DatabaseManager {
         } catch (SQLException s) {
             connection.rollback();
             log.append("Deleting Person with ID = "+id+" record failed. '\n'");
-            //log.close();
         }
 
         log.append("Delete person with ID = "+id+" record. '\n'");
-        //log.close();
 
         // *************
         // Address
@@ -400,11 +557,9 @@ public class DatabaseManager {
         } catch (SQLException s) {
             connection.rollback();
             log.append("Deleting VoterAddress with ID = "+id+" record failed. '\n'");
-            //log.close();
         }
 
         log.append("Delete VoterAddress with ID = "+id+" record. '\n'");
-        //log.close();
 
         // *************
         // CONTACT INFO
@@ -426,11 +581,9 @@ public class DatabaseManager {
         } catch (SQLException s) {
             connection.rollback();
             log.append("Deleting ContactInfo with ID = "+id+" record failed. '\n'");
-            //log.close();
         }
 
         log.append("Delete ContactInfo with ID = "+id+" record. '\n'");
-        log.close();
 
     }
 
@@ -565,5 +718,11 @@ public class DatabaseManager {
             e.printStackTrace();
         }
         return true;
+    }
+
+
+    public void closeFile() throws IOException
+    {
+        log.close();
     }
 }
