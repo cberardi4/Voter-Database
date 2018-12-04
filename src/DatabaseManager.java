@@ -298,7 +298,7 @@ public class DatabaseManager {
             e.printStackTrace();
         }
 
-        // delete record from Person table
+        // delete     record from Person table
         sql = p.updateName(id);
 
         // execute query
