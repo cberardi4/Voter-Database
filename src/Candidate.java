@@ -44,7 +44,7 @@ public class Candidate extends Person
 
     public String selectAllCandidateNames()
     {
-        return "SELECT firstName, lastName FROM CandidateNames;";
+        return "SELECT c.firstName, c.lastName, i.description FROM CandidateNames c, CandidateInfo i where c.candidateID = i.candidateID;";
     }
 
     public String getCandidateNameFromID(int candidateID)

@@ -78,6 +78,12 @@ public class DatabaseManager {
                 // execute insert statement
                 preparedStatementPerson.executeUpdate();
                 connection.commit();
+
+                // get primary key from sql query to use as PK in other tables
+                rs = preparedStatementPerson.getGeneratedKeys();
+                if (rs != null && rs.next())
+                    id = rs.getInt(1);
+
                 log.append("Create person record with ID = "+id+". '\n'");
                 System.out.println("Created person with ID = "+id+".");
             } catch (SQLException s) {
@@ -87,10 +93,6 @@ public class DatabaseManager {
 
             }
 
-            // get primary key from sql query to use as PK in other tables
-            rs = preparedStatementPerson.getGeneratedKeys();
-            if (rs != null && rs.next())
-                id = rs.getInt(1);
 
             // log action
 
@@ -925,6 +927,50 @@ public class DatabaseManager {
         }
         return candidates;
     }
+
+
+    public void contactInfoReport(String username, String password) throws SQLException, IOException {
+
+        String sql = "Select p.ID, p.firstName, p.lastName, i.email, i.homePhone, i.cellPhone, a.streetNumber, a.street, a.zip, z.state" +
+                " From Person p, VoterContactInfo i, VoterAddress a, ZipCodeInfo z" +
+                " Where p.ID = i.ID AND p.ID = a.ID AND a.zip = z.zip";
+        String firstName="", lastName="", email="", homePhone="", cellPhone="", street="", state="";
+        int streetNumber=0, zip=0, id=0;
+
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+        FileWriter writer = new FileWriter("ContactInfo.csv");
+
+        while(rs.next())
+        {
+            id = rs.getInt("ID");
+            firstName = rs.getString("firstName");
+            lastName = rs.getString("lastName");
+            email = rs.getString("email");
+            homePhone = rs.getString("homePhone");
+            cellPhone = rs.getString("cellPhone");
+            streetNumber = rs.getInt("streetNumber");
+            street = rs.getString("street");
+            zip = rs.getInt("zip");
+            state = rs.getString("state");
+            writer.append(id + ", " + firstName + ", " + lastName + ", " + email + ", " + homePhone + ", " +
+                    cellPhone + ", " + streetNumber + ", " + street + ", " + zip + ", " + state + '\n');
+        }
+        writer.close();
+    }
+
+
+
 
 
 

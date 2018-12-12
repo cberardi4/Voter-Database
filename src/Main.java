@@ -60,6 +60,7 @@ public class Main {
             System.out.println("5. Delete a voter");
             System.out.println("6. Withdraw candidate");
             System.out.println("7. Update information (candidate or voter)");
+            System.out.println("8. Exit");
 
             choice = Integer.parseInt(keyboard.nextLine());
 
@@ -82,9 +83,7 @@ public class Main {
                     executePrintOption(c, user, password);
                     break;
                 case 4:
-                    // needs to be implemented
-                    //generate csv with results
-                    //& print to screen
+                    printReports(user, password);
                     break;
                 case 5:
                     deletePerson(user, password);
@@ -95,6 +94,9 @@ public class Main {
                 case 7:
                     updateInformation(user, password);
                     break;
+                case 8:
+                    System.out.println("Thank you! See you next time.");
+                    System.exit(0);
                 default:
                     System.out.println("Not a valid option. Must be between 1 and 7");
                     continue;
@@ -123,6 +125,43 @@ public class Main {
 //
 //    }
 
+    // asks user what kind of report they want to print before interfacing with the database
+    public static void printReports(String user, String password) throws Exception
+    {
+        int choice = 0;
+        // how to break out of while loop
+        boolean goAgain = true;
+
+        while(goAgain) {
+            System.out.println("What kind of report would you like to print?");
+            System.out.println("1. Total Votes per candidate");
+            System.out.println("2. Voter contact information");
+            System.out.println("3. Candidate contact information");
+            choice = Integer.parseInt(keyboard.nextLine());
+
+            switch (choice)
+            {
+                case 1:
+                    break;
+
+                // voter contact info
+                case 2:
+                    manager.contactInfoReport(user, password);
+                    goAgain = false;
+                    break;
+
+                case 3:
+                    break;
+
+                default:
+                    System.out.println("Not a valid option. Try again.");
+            }
+        }
+    }
+
+
+
+    // helper function for voting
     public static void vote(String user, String password) throws Exception {
 
         String[] candidates;
