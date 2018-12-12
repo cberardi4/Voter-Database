@@ -55,4 +55,7 @@ Written in order in which the classes get called
 - Main > Database Manager > Person
 
 
+## Schema
+![](schema.png)
+
    
