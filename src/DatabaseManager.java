@@ -520,9 +520,6 @@ public class DatabaseManager {
     }
 
 
-
-
-
     public void vote(String username, String password, int id, int candidateID) throws Exception
     {
         PreparedStatement preparedStatement;
@@ -594,6 +591,35 @@ public class DatabaseManager {
             connection = con.Connector(username, password);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // have to decrement amount of votes for candidate they voted for now that they're no longer in database
+        try {
+            // get the candidateID of who they voted for
+            sql = p.getCandidateID(id);
+            preparedStatement = connection.prepareStatement(sql);
+            ResultSet rs = preparedStatement.executeQuery();
+            rs.first();
+            int candID = rs.getInt(1);
+            int numVotesBeforeDeletingVote;
+
+            // first must get how many votes they have
+            sql = c.getNumberVotesForCandidate(candID);
+            preparedStatement = connection.prepareStatement(sql);
+            rs = preparedStatement.executeQuery();
+            rs.next();
+            numVotesBeforeDeletingVote = rs.getInt(1);
+
+            // now must increment number of votes by one
+            sql = c.removeVote(candID, numVotesBeforeDeletingVote);
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+
+            log.append("Removed vote for candidate with ID = " + candID);
+        }
+        catch (SQLException s) {
+            System.out.println("Could not change count of votes");
+            log.append("Could not change count of votes");
         }
 
 
@@ -761,7 +787,6 @@ public class DatabaseManager {
         }
 
         log.append("Delete CandidateNames with candidateID = "+candidateID+" record. '\n'");
-        log.close();
 
     }
 

@@ -115,6 +115,12 @@ public class Candidate extends Person
         return "UPDATE CandidateInfo SET numberVotes = " + newNumberVotes + " WHERE candidateID = " + candidateID+";";
     }
 
+    public String removeVote(int candidateID, int newNumberVotes)
+    {
+        newNumberVotes--;
+        return "UPDATE CandidateInfo SET numberVotes = " + newNumberVotes + " WHERE candidateID = " + candidateID+";";
+    }
+
 
 //
 //    /*

@@ -59,6 +59,8 @@ public class Person
 
     public String deletePerson(int id)
     {
+
+
         return "DELETE FROM Person WHERE ID = " + id + ";";
     }
 
@@ -131,7 +133,10 @@ public class Person
         return "UPDATE Person SET candidateID = "+candidateID+" WHERE ID = " + id + ";";
     }
 
-
+    public String getCandidateID (int id)
+    {
+        return "SELECT candidateID FROM Person WHERE ID = " + id + ";";
+    }
 
     /*
     ***********************************************
@@ -139,8 +144,6 @@ public class Person
     GET USER INPUT TO CREATE NEW DATABASE RECORDS
     ***********************************************
     */
-
-    // NEED TO FIX THIS FUNCTION
 
 
     // gets user input to create first name and validates input
