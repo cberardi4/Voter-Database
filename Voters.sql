@@ -59,8 +59,8 @@ CREATE TABLE `Voters`.`ZipCodeInfo` (
   PRIMARY KEY (`idZipCodeInfo`))
 
 INSERT INTO `Party` VALUES (1,'Republican'),(2,'Democrat'),(3,'Independent'),(4,'Libertarian'),(5,'Green Party');
-INSERT INTO `CandidateNames` VALUES (1,"Eric","Linstead"),(2,"Rene","German"),(3,"Elizabeth","Stevens");
-INSERT INTO `Person` VALUES (1001, "Eric", "Linstead", 40, "M", 1, 2),(1002,"Rene","German",30, 2,1),(1003,"Elizabeth","Stevens",28,3,3);
+INSERT INTO `CandidateNames` VALUES (1,"Erik","Linstead"),(2,"Rene","German"),(3,"Elizabeth","Stevens");
+INSERT INTO `Person` VALUES (1001, "Erik", "Linstead", 40, "M", 1, 2),(1002,"Rene","German",30,"M", 2,1),(1003,"Elizabeth","Stevens",28,"F",3,3);
 INSERT INTO `Candidate` VALUES (1001,1),(1002,2),(1003,3);
 INSERT INTO `CandidateInfo` VALUES (1,"I believe that not all heroes wear capes, I am one of those.",0),(2,"Steak and lobster for all!",0),(3,"I was once DG president, I can do it again.",0);
 INSERT INTO `VoterAddress` VALUES (1001,3246,"Chapman",92866),(1002,54679,"Glassel",92866),(1003,726,"Walnut",92867);

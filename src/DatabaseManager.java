@@ -318,6 +318,27 @@ public class DatabaseManager {
         log.append("Updated name in Person record with id =  "+id+". '\n'");
     }
 
+    public void updateCandidate(String username, String password, int candidateID) throws Exception
+    {
+        String sql;
+        PreparedStatement preparedStatement;
+
+        //connect to database
+        try{
+            connection = con.Connector(username, password);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        sql = c.updateDescription(candidateID);
+
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.executeUpdate();
+
+        log.append("Updated description in CandidateInfo record with candidateID =  "+candidateID+". '\n'");
+        log.close();
+    }
+
     public void updateVoterAddress(String username, String password, int id) throws Exception {
 
         PreparedStatement preparedStatement;
@@ -587,7 +608,7 @@ public class DatabaseManager {
 
     }
 
-    // deletes a candidate, including their record in Candidate, CandidateInfo, and CandidateNames
+    //deletes a candidate, including their record in Candidate, CandidateInfo, and CandidateNames
     public void deleteCandidate(String username, String password, int candidateID) throws Exception {
 
         String sql, sql2, sql3;
@@ -712,6 +733,28 @@ public class DatabaseManager {
         displayResultSetPerson(rs);
     }
 
+    public void selectAllCandidates(String username, String password) throws Exception
+    {
+        String sql;
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sql = c.printCandidateInfo();
+
+        // convert string into SQL statement and insert into database
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+
+        displayResultSetCandidate(rs);
+    }
+
     // returns the number of voters in a certain party (given by user input)
     public void numberRegisteredVotersInParty(String username, String password) throws Exception {
         String sql;
@@ -819,6 +862,17 @@ public class DatabaseManager {
             gender = rs.getString("gender");
             partyID = rs.getInt("partyID");
             System.out.println(firstName + ", " + lastName + ", " + age + ", " + gender + ", " + partyID);
+        }
+    }
+
+    public void displayResultSetCandidate(ResultSet rs) throws Exception
+    {
+        while (rs.next())
+        {
+            String firstName = rs.getString("firstName");
+            String lastName = rs.getString("lastName");
+            String desc = rs.getString("description");
+            System.out.println(firstName+", "+lastName+", "+"'"+desc+"'");
         }
     }
 

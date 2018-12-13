@@ -317,7 +317,7 @@ public class Main {
         {
             System.out.println("Select an Option:");
             System.out.println("1. Print all voters");
-            System.out.println("2. Print Candidates from selected Party");
+            System.out.println("2. Print all candidates");
             System.out.println("3. Print how many registered voters from selected party");
 
             choice = Integer.parseInt(keyboard.nextLine());
@@ -341,7 +341,7 @@ public class Main {
                 manager.selectAllVoters(user, password);
                 break;
             case 2:
-                // need to be implemented
+                manager.selectAllCandidates(user, password);
                 break;
             case 3:
                 manager.numberRegisteredVotersInParty(user, password);
