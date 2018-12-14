@@ -193,96 +193,7 @@ public class DatabaseManager {
     }
 
 
-//    public void createCandidate(String username, String password) throws Exception
-//    {
-//        /* *****************
-//         Candidate TABLE
-//         ******************* */
-//
-//        String sqlC, sqlCI, sqlCN;
-//        int id=0, candidateID=0;
-//        PreparedStatement preparedStatementCandidate, preparedStatementCandidateInfo, preparedStatementCandidateNames;
-//        ResultSet rs;
-//
-//        // connect to database
-//        try {
-//            connection = con.Connector(username, password);
-//
-//            // Transaction
-//            connection.setAutoCommit(false);
-//
-//            // *************
-//            // Candidate
-//            // *************
-//
-//            // get SQL statement for creating a new record in Candidate table
-//            sqlC = c.createCandidate(id);
-//
-//            // convert string into SQL statement and insert into database
-//            preparedStatementCandidate = connection.prepareStatement(sqlC, PreparedStatement.RETURN_GENERATED_KEYS);
-//
-//            // want to rollback unless all insert statements are executed in this function
-//            try {
-//                // execute insert statement
-//                preparedStatementCandidate.executeUpdate();
-//                connection.commit();
-//            } catch (SQLException s) {
-//                connection.rollback();
-//            }
-//
-//            // get primary key from sql query to use as PK in other tables
-//            rs = preparedStatementCandidate.getGeneratedKeys();
-//            if (rs != null && rs.next())
-//                id = rs.getInt(1);
-//
-//            // *************
-//            // CANDIDATE INFO
-//            // *************
-//
-//            // Transaction
-//            connection.setAutoCommit(false);
-//
-//            // get SQL statement for creating a new record in Candidate Info table
-//            sqlCI = c.populateCandidateInfo(candidateID);
-//
-//            // convert string into SQL statement and insert into database
-//            preparedStatementCandidateInfo = connection.prepareStatement(sqlCI);
-//
-//            // want to rollback unless all insert statements are executed in this function
-//            try {
-//                // execute insert statement
-//                preparedStatementCandidateInfo.executeUpdate();
-//                connection.commit();
-//            } catch (SQLException s) {
-//                connection.rollback();
-//            }
-//
-//            // *************
-//            // Candidate Names
-//            // *************
-//
-//            // Transaction
-//            connection.setAutoCommit(false);
-//
-//            sqlCN = c.populateCandidateNames(candidateID);
-//
-//            // convert string into SQL statement and insert into database
-//            preparedStatementCandidateNames = connection.prepareStatement(sqlCN);
-//
-//            // want to rollback unless all insert statements are executed in this function
-//            try {
-//                // execute insert statement
-//                preparedStatementCandidateNames.executeUpdate();
-//                connection.commit();
-//            } catch (SQLException s) {
-//                connection.rollback();
-//            }
-//            // end of transaction
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+
 
     /*
     *********************
@@ -821,6 +732,30 @@ public class DatabaseManager {
         displayResultSetPerson(rs);
     }
 
+    public void selectAllCandidates(String username, String password) throws Exception
+    {
+        String sql;
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sql = c.printCandidateInformation();
+
+
+        // convert string into SQL statement and insert into database
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+
+        displayResultSetCandidate(rs);
+
+    }
+
     public void numberRegisteredVotersInParty(String username, String password) throws Exception {
 
         PreparedStatement preparedStatement;
@@ -920,6 +855,41 @@ public class DatabaseManager {
 
         return name;
 
+    }
+
+    public String printNumberVotesCandidate(String username, String password) throws SQLException
+    {
+        String sql1, sql2, sql3, result;
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sql1 = c.getNumberVotesForCandidate(1);
+        sql2 = c.getNumberVotesForCandidate(2);
+        sql3 = c.getNumberVotesForCandidate(3);
+
+        preparedStatement = connection.prepareStatement(sql1);
+        rs = preparedStatement.executeQuery();
+
+        int candidates[] = new int[3];
+        int numVotes;
+        int index = 0;
+
+        while(rs.next())
+        {
+            numVotes = rs.getInt("numberVotes");
+
+            candidates[index] = numVotes;
+            index++;
+        }
+
+        return result = "Erik Linstead " + String.valueOf(candidates[0]) + "Rene German " + String.valueOf(candidates[1]) + "Elizabeth Stevens " + String.valueOf(candidates[2]);
     }
 
     public String[] printAllCandidates(String username, String password) throws SQLException {
@@ -1023,6 +993,21 @@ public class DatabaseManager {
             System.out.println(firstName + ", " + lastName + ", " + age + ", " + gender + ", " + partyID);
         }
     }
+
+    public void displayResultSetCandidate(ResultSet rs) throws SQLException
+    {
+        System.out.println("Selected Candidate: ");
+        String firstName, lastName;
+
+        while (rs.next())
+        {
+            firstName = rs.getString("firstName");
+            lastName = rs.getString("lastName");
+            System.out.println(firstName + ", " + lastName);
+        }
+    }
+
+
 
     // query ZipCodeInfo Table to see if that zip is already in it
     // if it is, then you don't need to add it

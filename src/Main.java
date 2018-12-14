@@ -17,34 +17,13 @@ public class Main {
         System.out.println("password: ");
         password  = keyboard.nextLine();
 
-        //Candidate cand = new Candidate();
-
-        // generate data into a csv file
-        //DataGenerator df = new DataGenerator();
-        //df.createData(20);
 
         // id counts how many people have been added, used for sql queries (easier than having to do query for id of person)
         int numCandidates=0;
         String description, zip;
-//        String[] candidateName;
-//        String candFirstName, candLastName;
 
         // menu
         System.out.println("Hello! Welcome to Chappy eVote!");
-
-//        // create candidates, max 3 candidates
-//        while(numCandidates < 2)
-//        {
-//            System.out.println("First you must register as a voter, then we can move on to candidate registration");
-//            manager.createPerson(user, password);
-//
-//            //asks for description, checks max char count
-//            cand.createDescription();
-//            //adds candidate to all candidate tables
-//            //manager.createCandidate(user, password) //need description?
-//            numCandidates++;
-//
-//        }
 
 
         boolean continueRunning = true;
@@ -68,30 +47,30 @@ public class Main {
             {
                 // register to vote
                 // when creating new person, have to get general info, contact info, and address
-                case 1:
+                case 1: //DONE
                     // counting number of voters created will also be id number of current
                     // voter because ID numbers start at zero
                     // create a new person record
                     manager.createPerson(user, password);
                     break;
 
-                case 2:
+                case 2: //DONE
                     vote(user, password);
                     break;
-                case 3:
+                case 3: //DONE
                     c = printOptions();
                     executePrintOption(c, user, password);
                     break;
                 case 4:
                     printReports(user, password);
                     break;
-                case 5:
+                case 5: //DONE
                     deletePerson(user, password);
                     break;
-                case 6:
+                case 6: //DONE
                     deleteCandidate(user, password);
                     break;
-                case 7:
+                case 7: //DONE
                     updateInformation(user, password);
                     break;
                 case 8:
@@ -135,22 +114,19 @@ public class Main {
         while(goAgain) {
             System.out.println("What kind of report would you like to print?");
             System.out.println("1. Total Votes per candidate");
-            System.out.println("2. Voter contact information");
-            System.out.println("3. Candidate contact information");
+            System.out.println("2. Contact information");
             choice = Integer.parseInt(keyboard.nextLine());
 
             switch (choice)
             {
                 case 1:
+                    manager.printNumberVotesCandidate(user, password);
                     break;
 
                 // voter contact info
                 case 2:
                     manager.contactInfoReport(user, password);
                     goAgain = false;
-                    break;
-
-                case 3:
                     break;
 
                 default:
