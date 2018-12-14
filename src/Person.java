@@ -28,8 +28,8 @@ public class Person
         partyID = createPartyID();
 
         String sql = "INSERT INTO Person (firstName, lastName, age, gender, candidateID, partyID)" +
-                        "VALUES (" + ", '" +  firstName + "', '" + lastName + "', " +  age + ", '" + gender +
-                        "', " + candidateID + ", " + partyID + ");";
+                " VALUES ('" + firstName + "', '" + lastName + "', " +  age + ", '" + gender +
+                "', " + candidateID + ", " + partyID + ");";
         return sql;
     }
 
@@ -41,12 +41,14 @@ public class Person
     }
 
     // returns the number of registered voters in inputted party
-    public String numberRegisteredVotersInParty()
-    {
+    public String[] numberRegisteredVotersInParty() {
+
         System.out.println("Which party would you like to select? ");
         int choice = createPartyID();
 
-        return "SELECT count(*) FROM Person WHERE partyID = " + choice + ";";
+        // need to also return partyID so that you can query name for print statement
+        String[] sql = {"SELECT COUNT(*) AS count FROM Person WHERE partyID = " + choice + ";", Integer.toString(choice)};
+        return sql;
     }
 
     public String printPersonFromID(int id)
@@ -57,6 +59,8 @@ public class Person
 
     public String deletePerson(int id)
     {
+
+
         return "DELETE FROM Person WHERE ID = " + id + ";";
     }
 
@@ -102,6 +106,37 @@ public class Person
 
     }
 
+    public String updateAge(int id)
+    {
+        System.out.println("Enter new age: ");
+        age = createAge();
+
+        return "UPDATE Person SET age = " + age + " WHERE ID = " + id + ";";
+    }
+
+
+    public String updatePoliticalParty(int id)
+    {
+        System.out.println("Enter new political party: ");
+        partyID = createPartyID();
+
+        return "UPDATE Person SET partyID = " + partyID + " WHERE ID = " + id + ";";
+    }
+
+    public String getPartyName(int id)
+    {
+        return "SELECT partyName FROM Party WHERE partyID = "+id+";";
+    }
+
+    public String updateVote(int id, int candidateID)
+    {
+        return "UPDATE Person SET candidateID = "+candidateID+" WHERE ID = " + id + ";";
+    }
+
+    public String getCandidateID (int id)
+    {
+        return "SELECT candidateID FROM Person WHERE ID = " + id + ";";
+    }
 
     /*
     ***********************************************
@@ -109,6 +144,7 @@ public class Person
     GET USER INPUT TO CREATE NEW DATABASE RECORDS
     ***********************************************
     */
+
 
     // gets user input to create first name and validates input
     public String createFirstName()
@@ -227,7 +263,7 @@ public class Person
             if (partyID >= 1 && partyID <= 5)
             {
                 break;
-        }
+            }
             else
             {
                 System.out.println("Entered an invalid party option. Must be between 1 and 5");

@@ -34,8 +34,8 @@ public class Address
         // need to return the zip information on its own so that it can be added to the zip database in the
         // main without having to ask the user twice for this information
         String [] addressInfo =  {"INSERT INTO VoterAddress (ID, streetNumber, street, zip)" +
-                "VALUES (" + id + ", " + streetNumber + ", '" + street + "', '" +
-                zip + ");", zip, state};
+                " VALUES (" + id + ", " + streetNumber + ", '" + street + "', '" +
+                zip + "');", zip, state};
         return addressInfo;
     }
 
@@ -61,6 +61,16 @@ public class Address
                 "UPDATE VoterAddress SET street = '" + street + "' WHERE ID = " + id + ";",
                 "UPDATE VoterAddress SET zip = '" + zip + "' WHERE ID = " + id + ";"};
         return sql;
+    }
+
+    public String createZipCodeInfo(int zip, String state)
+    {
+        return "INSERT INTO ZipCodeInfo(zip, state) VALUES(" + zip + ", '" + state + "');";
+    }
+
+    public String checkIfZipAlreadyInDB(int zip)
+    {
+        return "SELECT zip FROM ZipCodeInfo;";
     }
 
 

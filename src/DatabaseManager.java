@@ -22,8 +22,7 @@ public class DatabaseManager {
     Address a = new Address();
     ContactInfo i = new ContactInfo();
     Candidate c = new Candidate();
-    ZipCodeInfo z = new ZipCodeInfo();
-
+    //ZipCodeInfo z = new ZipCodeInfo();
 
     FileWriter log;
 
@@ -79,19 +78,24 @@ public class DatabaseManager {
                 // execute insert statement
                 preparedStatementPerson.executeUpdate();
                 connection.commit();
+
+                // get primary key from sql query to use as PK in other tables
+                rs = preparedStatementPerson.getGeneratedKeys();
+                if (rs != null && rs.next())
+                    id = rs.getInt(1);
+
+                log.append("Create person record with ID = "+id+". '\n'");
+                System.out.println("Created person with ID = "+id+".");
             } catch (SQLException s) {
                 connection.rollback();
                 log.append("Creating person record failed. '\n'");
+                System.out.println("Creating person record failed.");
 
             }
 
-            // get primary key from sql query to use as PK in other tables
-            rs = preparedStatementPerson.getGeneratedKeys();
-            if (rs != null && rs.next())
-                id = rs.getInt(1);
 
             // log action
-            log.append("Create person record with ID = "+id+". '\n'");
+
 
             // *************
             // CONTACT INFO
@@ -111,12 +115,14 @@ public class DatabaseManager {
                 // execute insert statement
                 preparedStatementContact.executeUpdate();
                 connection.commit();
+                log.append("Create VoterContactInfo record with ID = "+id+". '\n'");
+                System.out.println("Create contact info successful with ID = "+id+".");
             } catch (SQLException s) {
                 connection.rollback();
                 log.append("Creating VoterContactInfo with ID = "+id+" record failed. '\n'");
+                System.out.println("Create contact info failed");
             }
 
-            log.append("Create VoterContactInfo record with ID = "+id+". '\n'");
 
             // *************
             // ADDRESS
@@ -142,13 +148,14 @@ public class DatabaseManager {
                 // execute insert statement
                 preparedStatementAddress.executeUpdate();
                 connection.commit();
+                log.append("Create VoterAddress with ID = "+id+" record. '\n'");
+                System.out.println("Create address successful.");
             } catch (SQLException s) {
                 connection.rollback();
                 log.append("Creating VoterAddress with ID = "+id+" record failed. '\n'");
+                System.out.println("Create address failed");
             }
 
-
-            log.append("Create VoterAddress with ID = "+id+" record. '\n'");
 
             // *************
             // ZIP CODE
@@ -165,16 +172,16 @@ public class DatabaseManager {
             if (addZip) {
                 // check if you need to add zip to database
                 try {
-                    sqlZ = z.createZipCodeInfo(zip, state);
+                    sqlZ = a.createZipCodeInfo(zip, state);
                     preparedStatementZip = connection.prepareStatement(sqlZ);
                     preparedStatementZip.executeUpdate();
                     connection.commit();
+                    log.append("Create ZipCode with zip = "+zip+" +record. '\n'");
                 } catch (SQLException e) {
                     connection.rollback();
                     log.append("Create ZipCodeInfo with zip = "+zip+" record failed. '\n'");
                 }
 
-                log.append("Create ZipCode with zip = "+zip+" +record. '\n'");
             }
 
 
@@ -318,27 +325,6 @@ public class DatabaseManager {
         log.append("Updated name in Person record with id =  "+id+". '\n'");
     }
 
-    public void updateCandidate(String username, String password, int candidateID) throws Exception
-    {
-        String sql;
-        PreparedStatement preparedStatement;
-
-        //connect to database
-        try{
-            connection = con.Connector(username, password);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        sql = c.updateDescription(candidateID);
-
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeUpdate();
-
-        log.append("Updated description in CandidateInfo record with candidateID =  "+candidateID+". '\n'");
-        log.close();
-    }
-
     public void updateVoterAddress(String username, String password, int id) throws Exception {
 
         PreparedStatement preparedStatement;
@@ -443,6 +429,28 @@ public class DatabaseManager {
 
     }
 
+
+    public void updateCandidateInfo(String username, String password, int candidateID) throws Exception
+    {
+        String sql;
+        PreparedStatement preparedStatement;
+
+        //connect to database
+        try{
+            connection = con.Connector(username, password);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        sql = c.updateDescription(candidateID);
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.executeUpdate();
+
+        log.append("Updated description in CandidateInfo record with candidateID =  "+candidateID+". '\n'");
+        log.close();
+
+    }
+
     public void updateAge(String username, String password, int id) throws Exception
     {
 
@@ -460,7 +468,6 @@ public class DatabaseManager {
 
         // delete record from VoterContactInfo table
         String sql = p.updateAge(id);
-        System.out.println("SQL: " + sql);
 
         try {
 
@@ -513,6 +520,59 @@ public class DatabaseManager {
     }
 
 
+    public void vote(String username, String password, int id, int candidateID) throws Exception
+    {
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+        int numVotesBeforeNewVote;
+        String sql, name="", firstName, lastName;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sql = c.getCandidateNameFromID(candidateID);
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+
+        // need to get name of the candidate they voted for for log/print statement
+        while(rs.next())
+        {
+            firstName = rs.getString("firstName");
+            lastName = rs.getString("lastName");
+            name = firstName + " " + lastName;
+        }
+
+
+        // update Person record to change who they voted for
+        sql = p.updateVote(id, candidateID);
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.executeUpdate();
+
+        // need to add vote to their name in CandidateInfo Table
+
+        // first must get how many votes they have
+        sql = c.getNumberVotesForCandidate(candidateID);
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+        rs.next();
+        numVotesBeforeNewVote = rs.getInt("numberVotes");
+
+        // now must increment number of votes by one
+        sql = c.addVote(candidateID, numVotesBeforeNewVote);
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.executeUpdate();
+
+        System.out.println("Successfully voted for " + name);
+
+        // log update
+        log.append("Voter with id =  "+id+" has voted for "+name+". '\n'");
+    }
+
+
 
     /*
     *******************
@@ -531,6 +591,35 @@ public class DatabaseManager {
             connection = con.Connector(username, password);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // have to decrement amount of votes for candidate they voted for now that they're no longer in database
+        try {
+            // get the candidateID of who they voted for
+            sql = p.getCandidateID(id);
+            preparedStatement = connection.prepareStatement(sql);
+            ResultSet rs = preparedStatement.executeQuery();
+            rs.first();
+            int candID = rs.getInt(1);
+            int numVotesBeforeDeletingVote;
+
+            // first must get how many votes they have
+            sql = c.getNumberVotesForCandidate(candID);
+            preparedStatement = connection.prepareStatement(sql);
+            rs = preparedStatement.executeQuery();
+            rs.next();
+            numVotesBeforeDeletingVote = rs.getInt(1);
+
+            // now must increment number of votes by one
+            sql = c.removeVote(candID, numVotesBeforeDeletingVote);
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+
+            log.append("Removed vote for candidate with ID = " + candID);
+        }
+        catch (SQLException s) {
+            System.out.println("Could not change count of votes");
+            log.append("Could not change count of votes");
         }
 
 
@@ -608,7 +697,7 @@ public class DatabaseManager {
 
     }
 
-    //deletes a candidate, including their record in Candidate, CandidateInfo, and CandidateNames
+    // deletes a candidate, including their record in Candidate, CandidateInfo, and CandidateNames
     public void deleteCandidate(String username, String password, int candidateID) throws Exception {
 
         String sql, sql2, sql3;
@@ -630,7 +719,7 @@ public class DatabaseManager {
         connection.setAutoCommit(false);
 
         // delete record from Candidate table
-        sql = c.deleteCandidate(candidateID);
+        sql = c.deleteCandNames(candidateID);
 
         preparedStatement = connection.prepareStatement(sql);
 
@@ -682,7 +771,7 @@ public class DatabaseManager {
         connection.setAutoCommit(false);
 
         // delete record from CandidateNames table
-        sql3 = c.deleteCandNames(candidateID);
+        sql3 = c.deleteCandidate(candidateID);
 
         preparedStatement = connection.prepareStatement(sql3);
 
@@ -698,7 +787,6 @@ public class DatabaseManager {
         }
 
         log.append("Delete CandidateNames with candidateID = "+candidateID+" record. '\n'");
-        log.close();
 
     }
 
@@ -733,31 +821,8 @@ public class DatabaseManager {
         displayResultSetPerson(rs);
     }
 
-    public void selectAllCandidates(String username, String password) throws Exception
-    {
-        String sql;
-        PreparedStatement preparedStatement;
-        ResultSet rs;
-
-        // connect to database
-        try {
-            connection = con.Connector(username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        sql = c.printCandidateInfo();
-
-        // convert string into SQL statement and insert into database
-        preparedStatement = connection.prepareStatement(sql);
-        rs = preparedStatement.executeQuery();
-
-        displayResultSetCandidate(rs);
-    }
-
-    // returns the number of voters in a certain party (given by user input)
     public void numberRegisteredVotersInParty(String username, String password) throws Exception {
-        String sql;
+
         PreparedStatement preparedStatement;
         ResultSet rs;
 
@@ -768,11 +833,31 @@ public class DatabaseManager {
             e.printStackTrace();
         }
 
-        sql = p.numberRegisteredVotersInParty();
+        // contains SQL statement at index 0 and the partyID at index 1
+        // needed so that you can print name of party
+        String[] sql = p.numberRegisteredVotersInParty();
 
-        preparedStatement = connection.prepareStatement(sql);
+        // execute query to get number of registered voters in selected party
+        preparedStatement = connection.prepareStatement(sql[0]);
         rs = preparedStatement.executeQuery();
+        int numInParty = 0;
+
+        // get count of registered voters from party from resultset
+        if (rs.next())
+            numInParty = rs.getInt("count");
+
+        // execute query to find the name of the party they selected for print statement
+        String sqlPartyName = p.getPartyName(Integer.parseInt(sql[1]));
+        preparedStatement = connection.prepareStatement(sqlPartyName);
+        rs = preparedStatement.executeQuery();
+        rs.next();
+        String pName = rs.getString(1);
+
+
+        System.out.println("There are " + numInParty + " registered voters in the " + pName+".");
     }
+
+
 
 
     public String printNameFromID(String username, String password, int id) throws Exception {
@@ -818,7 +903,7 @@ public class DatabaseManager {
             e.printStackTrace();
         }
 
-        sql = c.printCandidateFromCID(candidateID);
+        sql = c.getCandidateName(candidateID);
         preparedStatement = connection.prepareStatement(sql);
         rs = preparedStatement.executeQuery();
 
@@ -836,6 +921,80 @@ public class DatabaseManager {
         return name;
 
     }
+
+    public String[] printAllCandidates(String username, String password) throws SQLException {
+        String sql;
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sql = c.selectAllCandidateNames();
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+
+        String candidates[] = new String[3];
+        String firstName, lastName, fullName;
+        int index = 0;
+
+        while(rs.next())
+        {
+            firstName = rs.getString("firstName");
+            lastName = rs.getString("lastName");
+            fullName = firstName + " " + lastName;
+            candidates[index] = fullName;
+            index++;
+        }
+        return candidates;
+    }
+
+
+    public void contactInfoReport(String username, String password) throws SQLException, IOException {
+
+        String sql = "Select p.ID, p.firstName, p.lastName, i.email, i.homePhone, i.cellPhone, a.streetNumber, a.street, a.zip, z.state" +
+                " From Person p, VoterContactInfo i, VoterAddress a, ZipCodeInfo z" +
+                " Where p.ID = i.ID AND p.ID = a.ID AND a.zip = z.zip";
+        String firstName="", lastName="", email="", homePhone="", cellPhone="", street="", state="";
+        int streetNumber=0, zip=0, id=0;
+
+        PreparedStatement preparedStatement;
+        ResultSet rs;
+
+        // connect to database
+        try {
+            connection = con.Connector(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        preparedStatement = connection.prepareStatement(sql);
+        rs = preparedStatement.executeQuery();
+        FileWriter writer = new FileWriter("ContactInfo.csv");
+
+        while(rs.next())
+        {
+            id = rs.getInt("ID");
+            firstName = rs.getString("firstName");
+            lastName = rs.getString("lastName");
+            email = rs.getString("email");
+            homePhone = rs.getString("homePhone");
+            cellPhone = rs.getString("cellPhone");
+            streetNumber = rs.getInt("streetNumber");
+            street = rs.getString("street");
+            zip = rs.getInt("zip");
+            state = rs.getString("state");
+            writer.append(id + ", " + firstName + ", " + lastName + ", " + email + ", " + homePhone + ", " +
+                    cellPhone + ", " + streetNumber + ", " + street + ", " + zip + ", " + state + '\n');
+        }
+        writer.close();
+    }
+
+
 
 
 
@@ -865,17 +1024,6 @@ public class DatabaseManager {
         }
     }
 
-    public void displayResultSetCandidate(ResultSet rs) throws Exception
-    {
-        while (rs.next())
-        {
-            String firstName = rs.getString("firstName");
-            String lastName = rs.getString("lastName");
-            String desc = rs.getString("description");
-            System.out.println(firstName+", "+lastName+", "+"'"+desc+"'");
-        }
-    }
-
     // query ZipCodeInfo Table to see if that zip is already in it
     // if it is, then you don't need to add it
     // returns true if a new zip code record needs to be created
@@ -887,7 +1035,7 @@ public class DatabaseManager {
 
         try {
 
-            sqlCheck = z.checkIfZipAlreadyInDB(zip);
+            sqlCheck = a.checkIfZipAlreadyInDB(zip);
             preparedStatementZip = connection.prepareStatement(sqlCheck);
             rs = preparedStatementZip.executeQuery();
 
