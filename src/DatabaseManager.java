@@ -860,8 +860,8 @@ public class DatabaseManager {
     public String printNumberVotesCandidate(String username, String password) throws SQLException
     {
         String sql1, sql2, sql3, result;
-        PreparedStatement preparedStatement;
-        ResultSet rs;
+        PreparedStatement preparedStatement1, preparedStatement2, preparedStatement3;
+        ResultSet rs1, rs2, rs3;
 
         // connect to database
         try {
@@ -874,20 +874,29 @@ public class DatabaseManager {
         sql2 = c.getNumberVotesForCandidate(2);
         sql3 = c.getNumberVotesForCandidate(3);
 
-        preparedStatement = connection.prepareStatement(sql1);
-        rs = preparedStatement.executeQuery();
+        preparedStatement1 = connection.prepareStatement(sql1);
+        preparedStatement2 = connection.prepareStatement(sql2);
+        preparedStatement3 = connection.prepareStatement(sql3);
+        rs1 = preparedStatement1.executeQuery();
+        rs2 = preparedStatement2.executeQuery();
+        rs3 = preparedStatement3.executeQuery();
+
 
         int candidates[] = new int[3];
         int numVotes;
         int index = 0;
 
-        while(rs.next())
-        {
-            numVotes = rs.getInt("numberVotes");
+        candidates[0] = rs1.getInt("numberVotes");
+        candidates[1] = rs2.getInt("numberVotes");
+        candidates[2] = rs3.getInt("numberVotes");
 
-            candidates[index] = numVotes;
-            index++;
-        }
+//        while(rs.next())
+//        {
+//            numVotes = rs.getInt("numberVotes");
+//
+//            candidates[index] = numVotes;
+//            index++;
+//        }
 
         return result = "Erik Linstead " + String.valueOf(candidates[0]) + "Rene German " + String.valueOf(candidates[1]) + "Elizabeth Stevens " + String.valueOf(candidates[2]);
     }

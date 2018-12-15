@@ -113,18 +113,19 @@ public class Main {
 
         while(goAgain) {
             System.out.println("What kind of report would you like to print?");
-            System.out.println("1. Total Votes per candidate");
-            System.out.println("2. Contact information");
+//            System.out.println("1. Total Votes per candidate");
+            System.out.println("1. Contact information");
             choice = Integer.parseInt(keyboard.nextLine());
+
 
             switch (choice)
             {
-                case 1:
-                    manager.printNumberVotesCandidate(user, password);
-                    break;
+//                case 1:
+//                    manager.printNumberVotesCandidate(user, password);
+//                    break;
 
                 // voter contact info
-                case 2:
+                case 1:
                     manager.contactInfoReport(user, password);
                     goAgain = false;
                     break;
